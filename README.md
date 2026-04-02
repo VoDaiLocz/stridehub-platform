@@ -68,6 +68,7 @@ The repository now includes:
 .\backend\mvnw.cmd test
 .\backend\mvnw.cmd -q -DskipTests compile
 pnpm --dir frontend lint
+pnpm --dir frontend test --run
 pnpm --dir frontend build
 ```
 

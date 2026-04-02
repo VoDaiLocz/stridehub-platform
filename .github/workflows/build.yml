@@ -1,14 +1,24 @@
-name: build
+name: ci
 
 on:
   push:
     branches:
       - main
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   backend:
+    name: Backend Verification
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     defaults:
       run:
@@ -35,7 +45,9 @@ jobs:
         run: ./mvnw -B -DskipTests compile
 
   frontend:
+    name: Frontend Verification
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Check out repository
@@ -58,6 +70,9 @@ jobs:
 
       - name: Lint frontend
         run: pnpm --dir frontend lint
+
+      - name: Run frontend test suite
+        run: pnpm --dir frontend test --run
 
       - name: Build frontend
         run: pnpm --dir frontend build
