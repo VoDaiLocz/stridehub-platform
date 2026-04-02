@@ -155,12 +155,47 @@ Use the pattern:
 - integration tests for register/login/refresh
 - authorization tests for protected endpoints
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.1-FE**
 
-- build `frontend/src` auth screens for register and login
-- add buyer header auth state for signed-in vs signed-out modes
-- add frontend API client wiring for `/auth/register`, `/auth/login`, `/auth/refresh`, and `/me`
-- add route guard placeholder for authenticated pages
+**Objective:**
+
+Deliver the buyer-facing authentication shell that can register, log in, bootstrap the current user, and protect account-aware screens using the identity APIs from Task 1.1.
+
+**Files:**
+
+- Create or modify: `frontend/src/features/auth/...`
+- Create or modify: `frontend/src/features/session/...`
+- Create or modify: `frontend/src/components/layout/...`
+- Create or modify: `frontend/src/lib/api/...`
+- Create or modify: `frontend/src/App.tsx`
+
+**Required Features:**
+
+- register screen
+- login screen
+- current-user bootstrap
+- signed-in vs signed-out header state
+- protected route or protected layout placeholder
+- logout state reset
+
+**Implementation Steps:**
+
+1. Create frontend request helpers for `/auth/register`, `/auth/login`, `/auth/refresh`, and `/me`.
+2. Add auth state storage strategy suitable for the current frontend shell.
+3. Build register and login forms with backend error rendering.
+4. Load current user state on app bootstrap or route entry.
+5. Add protected-layout or route-guard behavior for account-aware pages.
+6. Show signed-in vs signed-out state in the buyer header.
+
+**Verification:**
+
+- frontend auth form submission works against the implemented API
+- protected screens redirect or block correctly when unauthenticated
+- refresh or current-user bootstrap restores session state as designed
+
+**Suggested Frontend Commit Message:**
+
+`task 1.1.2: add buyer auth screens and session bootstrap`
 
 **Commit Message:**
 
@@ -199,12 +234,47 @@ Use the pattern:
 - API tests for listing and detail
 - tests confirming non-active products are not exposed
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.2-FE**
 
-- implement buyer home page sections that depend on category, brand, and featured product APIs
-- implement product listing page with filter and sort controls
-- implement product detail page with variant picker, gallery, and price display
-- keep mocked fallback data only where the backend endpoint is still intentionally deferred
+**Objective:**
+
+Build the buyer browsing experience for discovery and product detail using live catalog APIs instead of static placeholders.
+
+**Files:**
+
+- Create or modify: `frontend/src/features/catalog/...`
+- Create or modify: `frontend/src/features/home/...`
+- Create or modify: `frontend/src/pages/...`
+- Create or modify: `frontend/src/lib/api/...`
+- Create or modify: `frontend/src/App.tsx`
+
+**Required Features:**
+
+- buyer home page sections fed by catalog data
+- product listing page
+- product detail page
+- category and brand filters
+- variant picker display
+- loading, empty, and error states
+
+**Implementation Steps:**
+
+1. Create catalog API client functions for categories, brands, listing, and detail.
+2. Build home page sections that consume real category or featured product data.
+3. Build listing page with filter and sort UI that maps to backend query parameters.
+4. Build product detail page with gallery, price, variant options, and product metadata.
+5. Keep mocks only for data the backend intentionally has not delivered yet.
+6. Add loading, empty, and error handling for every buyer catalog screen.
+
+**Verification:**
+
+- listing and detail pages render from real API responses
+- filter changes trigger the expected backend request pattern
+- inactive or hidden products are not displayed in buyer UI
+
+**Suggested Frontend Commit Message:**
+
+`task 1.2.2: add buyer catalog listing and product detail pages`
 
 **Commit Message:**
 
@@ -243,11 +313,42 @@ Use the pattern:
 - unit tests for reservation rules
 - concurrency integration test for low-stock reservation race
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.3-FE**
 
-- wire stock and availability badges on product detail and listing cards
-- disable impossible variant selections when availability data says the option is unavailable
-- show inventory-aware CTA states such as `In stock`, `Low stock`, and `Out of stock`
+**Objective:**
+
+Expose inventory-aware UX so the buyer storefront reflects backend stock truth without inventing its own reservation logic.
+
+**Files:**
+
+- Modify: `frontend/src/features/catalog/...`
+- Modify: `frontend/src/features/home/...`
+- Modify: `frontend/src/components/...`
+
+**Required Features:**
+
+- stock badges on listing cards
+- availability state on product detail
+- disabled unavailable variant options
+- CTA state changes for out-of-stock conditions
+
+**Implementation Steps:**
+
+1. Map backend availability fields into reusable frontend view models.
+2. Add stock badges for listing cards and featured product sections.
+3. Disable impossible variant combinations in the product detail page.
+4. Show CTA states such as `In stock`, `Low stock`, and `Out of stock`.
+5. Ensure cart entry points respect backend availability state.
+
+**Verification:**
+
+- unavailable variants cannot be selected in the UI
+- stock labels change correctly with API response data
+- add-to-cart entry points do not remain enabled for impossible purchases
+
+**Suggested Frontend Commit Message:**
+
+`task 1.3.2: add inventory-aware storefront states`
 
 **Commit Message:**
 
@@ -286,11 +387,46 @@ Use the pattern:
 - controller tests for add/update/remove
 - integration test for cart ownership isolation
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.4-FE**
 
-- implement cart drawer or cart page tied to authenticated buyer state
-- add add-to-cart, update quantity, and remove-item flows from product detail and cart UI
-- show cart subtotal and validation messages from backend responses
+**Objective:**
+
+Build the buyer cart experience and connect it to the authenticated cart API.
+
+**Files:**
+
+- Create or modify: `frontend/src/features/cart/...`
+- Modify: `frontend/src/features/catalog/...`
+- Modify: `frontend/src/components/layout/...`
+- Modify: `frontend/src/lib/api/...`
+
+**Required Features:**
+
+- cart page or cart drawer
+- add-to-cart from product detail
+- quantity update
+- remove item
+- subtotal display
+- cart error and validation messages
+
+**Implementation Steps:**
+
+1. Create cart API client functions for read, add, update, and remove.
+2. Implement cart page or drawer connected to authenticated buyer state.
+3. Wire add-to-cart from product detail into the cart module.
+4. Add quantity update and remove-item flows.
+5. Render subtotal and backend validation messages directly from the API response.
+6. Update cart badge or header summary state after cart mutations.
+
+**Verification:**
+
+- buyer can add, update, and remove cart items through the UI
+- cart subtotal and line items stay in sync with backend responses
+- unauthorized cart access is blocked or redirected properly
+
+**Suggested Frontend Commit Message:**
+
+`task 1.4.2: add buyer cart experience and api integration`
 
 **Commit Message:**
 
@@ -328,11 +464,43 @@ Use the pattern:
 - test that checkout fails when a variant is inactive or out of stock
 - test that checkout creates inventory reservations
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.5-FE**
 
-- implement checkout page with address form shell, cart summary, and checkout session creation
-- surface backend revalidation errors clearly when price, stock, or product status changes
-- display checkout expiry or reservation timeout information in the UI
+**Objective:**
+
+Build the checkout page and connect it to backend checkout-session creation and revalidation behavior.
+
+**Files:**
+
+- Create or modify: `frontend/src/features/checkout/...`
+- Modify: `frontend/src/features/cart/...`
+- Modify: `frontend/src/lib/api/...`
+
+**Required Features:**
+
+- checkout page
+- cart summary during checkout
+- checkout-session creation trigger
+- backend validation error display
+- reservation expiry or timeout indicator
+
+**Implementation Steps:**
+
+1. Create checkout API client functions for session creation.
+2. Build the checkout page with summary, address shell, and checkout CTA.
+3. Surface backend revalidation failures clearly when price, stock, or status changes.
+4. Render reservation expiry or timeout feedback where available.
+5. Prevent progression when checkout validation fails.
+
+**Verification:**
+
+- checkout page creates a session successfully for valid carts
+- stale cart conditions surface readable errors
+- buyer can see reservation timeout or expiry information in the UI
+
+**Suggested Frontend Commit Message:**
+
+`task 1.5.2: add buyer checkout screen and validation flow`
 
 **Commit Message:**
 
@@ -372,11 +540,43 @@ Use the pattern:
 - unit tests for provider abstraction behavior
 - integration test for duplicate webhook replay
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.6-FE**
 
-- integrate payment initiation from the checkout page
-- add pending, failed, and success payment states in the buyer flow
-- prepare frontend polling or redirect-handling behavior if the mock provider flow needs it locally
+**Objective:**
+
+Integrate payment initiation and status handling into the checkout flow without coupling the UI to a single provider implementation.
+
+**Files:**
+
+- Modify: `frontend/src/features/checkout/...`
+- Create or modify: `frontend/src/features/payment/...`
+- Modify: `frontend/src/lib/api/...`
+
+**Required Features:**
+
+- payment initiation from checkout
+- pending payment state
+- failed payment state
+- success handoff state
+- local mock-provider compatibility
+
+**Implementation Steps:**
+
+1. Add frontend API integration for payment initiation.
+2. Show pending state while payment is being created or processed.
+3. Show recoverable failure state when payment initiation fails.
+4. Support redirect, callback, or local mock-provider flow as required by the backend implementation.
+5. Pass successful payment outcome into order-confirmation handling.
+
+**Verification:**
+
+- payment initiation is triggered correctly from checkout
+- pending and failure states render correctly
+- successful payment path transitions cleanly to order-confirmation handling
+
+**Suggested Frontend Commit Message:**
+
+`task 1.6.2: integrate checkout payment states in buyer flow`
 
 **Commit Message:**
 
@@ -415,11 +615,43 @@ Use the pattern:
 - integration test from payment success to order creation
 - test that repeated webhook does not create a duplicate order
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.7-FE**
 
-- implement buyer order confirmation screen after successful payment
-- implement order detail and order history views under the buyer account area
-- show stable order snapshot data instead of reusing mutable catalog state
+**Objective:**
+
+Add buyer post-purchase screens so a confirmed order is visible as a stable commerce artifact.
+
+**Files:**
+
+- Create or modify: `frontend/src/features/orders/...`
+- Modify: `frontend/src/features/payment/...`
+- Modify: `frontend/src/pages/...`
+- Modify: `frontend/src/lib/api/...`
+
+**Required Features:**
+
+- order confirmation page
+- order history page
+- order detail page
+- stable order snapshot rendering
+
+**Implementation Steps:**
+
+1. Create buyer order API client functions.
+2. Build order confirmation screen for successful payment completion.
+3. Build order history view under buyer account area.
+4. Build order detail view from immutable order snapshot data.
+5. Ensure order rendering does not depend on mutable live catalog state.
+
+**Verification:**
+
+- buyer can see confirmed order information after payment success
+- order history and detail pages load from backend order APIs
+- order screens remain correct even if catalog data later changes
+
+**Suggested Frontend Commit Message:**
+
+`task 1.7.2: add buyer order confirmation and history pages`
 
 **Commit Message:**
 
@@ -458,11 +690,41 @@ Use the pattern:
 - tests for buyer cannot call admin endpoints
 - tests for approval changing seller state
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.8-FE**
 
-- add seller application page in the buyer account area
-- add status display for pending, approved, and rejected seller application states
-- keep admin approval UI out of scope for buyer web; reserve that for a later internal-facing frontend surface if needed
+**Objective:**
+
+Expose the seller-application experience inside the buyer account area without expanding into a full seller portal yet.
+
+**Files:**
+
+- Create or modify: `frontend/src/features/seller-application/...`
+- Modify: `frontend/src/features/account/...`
+- Modify: `frontend/src/lib/api/...`
+
+**Required Features:**
+
+- seller application form
+- seller application status view
+- pending, approved, and rejected UI states
+
+**Implementation Steps:**
+
+1. Create API client functions for seller-application submission and status lookup.
+2. Add seller-application entry point in the buyer account area.
+3. Build the application form using the backend contract.
+4. Render pending, approved, and rejected states clearly.
+5. Keep admin decision UI out of buyer web scope.
+
+**Verification:**
+
+- buyer can submit seller application through the UI
+- status page reflects backend state changes correctly
+- unauthorized admin actions are absent from buyer-facing UI
+
+**Suggested Frontend Commit Message:**
+
+`task 1.8.2: add seller application screens in buyer account area`
 
 **Commit Message:**
 
@@ -500,10 +762,36 @@ Use the pattern:
 
 - integration tests showing audit rows are written for admin approval and order confirmation
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.9-FE**
 
-- no major new buyer page is required
-- if useful, expose non-sensitive status breadcrumbs in the buyer UI such as payment processing or order confirmation states without leaking audit internals
+**Objective:**
+
+Refine buyer status feedback without exposing audit or outbox internals directly.
+
+**Files:**
+
+- Modify: `frontend/src/features/payment/...`
+- Modify: `frontend/src/features/orders/...`
+
+**Required Features:**
+
+- safer status breadcrumbs for payment and order progress
+- no exposure of privileged audit data
+
+**Implementation Steps:**
+
+1. Review buyer-facing status messaging around payment and order confirmation.
+2. Improve state labels where backend audit or outbox behavior influences visible flow.
+3. Ensure no audit-only or privileged operational fields are exposed in the buyer UI.
+
+**Verification:**
+
+- buyer sees useful payment/order progress cues
+- audit or internal event data does not leak into the public UI
+
+**Suggested Frontend Commit Message:**
+
+`task 1.9.2: refine buyer status messaging for payment and order flow`
 
 **Commit Message:**
 
@@ -531,11 +819,40 @@ Use the pattern:
 - validate YAML syntax
 - run API tests against implemented controllers
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.10-FE**
 
-- remove temporary frontend mocks for any endpoint now implemented for real
-- align frontend request and response types with the OpenAPI contract
-- verify frontend error rendering matches the shared error envelope
+**Objective:**
+
+Eliminate contract drift between frontend integrations and the documented Phase 1 API.
+
+**Files:**
+
+- Modify: `frontend/src/lib/api/...`
+- Modify: `frontend/src/features/**/...`
+- Modify: frontend request or response typing helpers as needed
+
+**Required Features:**
+
+- frontend request/response types aligned with OpenAPI
+- removal of stale mocks
+- error rendering aligned with shared envelope
+
+**Implementation Steps:**
+
+1. Update frontend API typings to match the latest documented contract.
+2. Remove temporary mocks for endpoints that now exist for real.
+3. Ensure frontend error rendering matches the shared error envelope.
+4. Re-run buyer flows that depend on auth, cart, checkout, and order APIs.
+
+**Verification:**
+
+- frontend integrations match implemented API payloads
+- temporary mocks are removed where no longer needed
+- API errors render predictably across buyer flows
+
+**Suggested Frontend Commit Message:**
+
+`task 1.10.2: align frontend integrations with phase 1 api contract`
 
 **Commit Message:**
 
@@ -565,11 +882,42 @@ Use the pattern:
 - `.\backend\mvnw.cmd test`
 - review CI YAML for syntax correctness
 
-**Frontend Companion Work:**
+**Frontend Companion Task 1.11-FE**
 
-- confirm frontend local startup, environment variables, and build scripts are documented correctly
-- ensure frontend CI steps still reflect actual workspace commands
-- clean any temporary UI scaffolding that no longer matches the real API contract
+**Objective:**
+
+Make the frontend workspace runnable, documented, and reviewable as part of the same professional delivery baseline as the backend.
+
+**Files:**
+
+- Modify: `frontend/README.md`
+- Modify: `README.md`
+- Modify: `frontend/.env.example`
+- Modify: any frontend scripts or config files that no longer match real usage
+
+**Required Features:**
+
+- correct frontend startup documentation
+- correct environment variable documentation
+- correct CI command references
+- removal of temporary UI scaffolding that conflicts with implemented APIs
+
+**Implementation Steps:**
+
+1. Review frontend run instructions and environment variables.
+2. Update docs so local startup and CI commands are accurate.
+3. Remove any temporary scaffolding or misleading placeholder behavior.
+4. Confirm the documented frontend workflow matches the actual workspace setup.
+
+**Verification:**
+
+- frontend startup docs work as written
+- CI commands listed in docs match the real workflow
+- buyer web still builds and tests cleanly after cleanup
+
+**Suggested Frontend Commit Message:**
+
+`task 1.11.2: align frontend workspace docs and delivery baseline`
 
 **Commit Message:**
 
