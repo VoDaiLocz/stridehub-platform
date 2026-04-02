@@ -10,7 +10,7 @@
 
 **Repository Layout Note:** The repository now uses `backend/` for the Spring Boot application and `frontend/` for the buyer web workspace. Backend file paths below should be read relative to `backend/`.
 
-**Current Baseline Status:** The current `main` branch already includes the project baseline, shared platform layer, database migrations, CI baseline, and monorepo split. When continuing from the repository as it exists today, start implementation from **Task 4** in this document. Tasks 1-3 remain here for traceability and for fresh rebuild scenarios.
+**Current Baseline Status:** The current `main` branch already includes Program 0 as historical tasks `0.1` through `0.6`. When continuing from the repository as it exists today, start implementation from **Task 1.1** in this document.
 
 ---
 
@@ -51,12 +51,12 @@ Each module should follow this internal structure where applicable:
 ### Branch and Commit Strategy
 
 - Keep working on `main` only if this remains a solo local repo.
-- Preferred commit format:
-  - `chore: ...`
-  - `feat: ...`
-  - `test: ...`
-  - `docs: ...`
-  - `refactor: ...`
+- Preferred commit subject format:
+  - `task <number>: <description>`
+- Examples:
+  - `task 0.1: establish backend foundation baseline`
+  - `task 1.1: implement authentication and rbac foundation`
+  - `task 1.1.1: add user and refresh token entities`
 
 ### Verification Commands
 
@@ -88,107 +88,20 @@ By the end of this plan, the repo should contain at minimum:
 - `docker-compose.yml`
 - `.env.example`
 
-## Task 1: Normalize Project Baseline
+## Historical Program 0 Tasks Already Completed
 
-**Objective:** Turn the starter project into a controllable application baseline suitable for modular work.
+The current repository state already contains the baseline delivered through these historical commits:
 
-**Files:**
+1. `task 0.1: establish backend foundation baseline`
+2. `task 0.2: add ci baseline and quick-start instructions`
+3. `task 0.3: align foundation docs with implementation baseline`
+4. `task 0.4: move spring boot application into backend workspace`
+5. `task 0.5: add buyer web workspace foundation`
+6. `task 0.6: align monorepo docs and ci workflow`
 
-- Modify: `backend/pom.xml`
-- Modify: `backend/src/main/resources/application.properties`
-- Create: `backend/src/main/resources/application.yml`
-- Create: `backend/src/main/resources/application-local.yml`
-- Create: `backend/src/main/resources/application-test.yml`
-- Create: `.env.example`
-- Create: `docker-compose.yml`
+If you need to rebuild Program 0 from scratch, use the full production plan as the canonical reference for the completed baseline history and resulting repository shape.
 
-**Implementation Steps:**
-
-1. Replace `application.properties` with profile-based YAML configuration.
-2. Add dependencies for OpenAPI and any test libraries needed for the first phase.
-3. Add explicit app config keys for JWT, payment provider mock settings, and reservation TTL.
-4. Add Docker Compose services for PostgreSQL and Redis.
-5. Add `.env.example` documenting required environment variables.
-
-**Verification:**
-
-- `.\backend\mvnw.cmd -q -DskipTests compile`
-- Confirm application config loads without placeholder resolution failures.
-
-**Commit Message:**
-
-`chore: establish application configuration baseline`
-
-## Task 2: Create Shared Platform Layer
-
-**Objective:** Establish shared conventions before building business modules.
-
-**Files:**
-
-- Create: `backend/src/main/java/com/stridehub/common/api/ApiErrorResponse.java`
-- Create: `backend/src/main/java/com/stridehub/common/api/ApiResponse.java`
-- Create: `backend/src/main/java/com/stridehub/common/exception/GlobalExceptionHandler.java`
-- Create: `backend/src/main/java/com/stridehub/common/exception/BusinessException.java`
-- Create: `backend/src/main/java/com/stridehub/common/exception/NotFoundException.java`
-- Create: `backend/src/main/java/com/stridehub/common/exception/ConflictException.java`
-- Create: `backend/src/main/java/com/stridehub/common/time/TimeProvider.java`
-- Create: `backend/src/main/java/com/stridehub/common/time/SystemTimeProvider.java`
-- Create: `backend/src/main/java/com/stridehub/common/id/CorrelationIdFilter.java`
-
-**Implementation Steps:**
-
-1. Define a consistent JSON error envelope.
-2. Add global exception handling for validation, security, and business exceptions.
-3. Introduce a `TimeProvider` abstraction to make expiry logic testable.
-4. Add correlation ID handling at the web layer.
-
-**Verification:**
-
-- Add controller-slice tests for validation and error envelope behavior.
-- `.\backend\mvnw.cmd test`
-
-**Commit Message:**
-
-`feat: add shared api and exception conventions`
-
-## Task 3: Create Database Foundation and Flyway Baseline
-
-**Objective:** Establish a durable relational schema for the first delivery slice.
-
-**Files:**
-
-- Create: `backend/src/main/resources/db/migration/V1__baseline_identity_and_catalog.sql`
-- Create: `backend/src/main/resources/db/migration/V2__commerce_core.sql`
-- Create: `backend/src/main/resources/db/migration/V3__seller_and_audit.sql`
-- Create: `backend/src/test/java/com/stridehub/integration/FlywayMigrationTest.java`
-
-**Schema Scope:**
-
-- identity: `users`, `roles`, `user_roles`, `refresh_tokens`, `addresses`
-- seller: `seller_profiles`, `seller_applications`
-- catalog: `categories`, `brands`, `products`, `product_variants`, `product_images`
-- inventory: `inventory_items`, `inventory_reservations`
-- cart: `carts`, `cart_items`
-- checkout/payment/order: `checkout_sessions`, `payments`, `payment_attempts`, `orders`, `order_items`
-- audit: `audit_logs`, `outbox_events`
-
-**Implementation Steps:**
-
-1. Write normalized schema with UUID primary keys.
-2. Add unique constraints for email, SKU, provider references.
-3. Add indexes for reservation expiry, order lookup, audit correlation, and product slug.
-4. Add migration test that boots context against a real PostgreSQL-compatible database when available.
-
-**Verification:**
-
-- `.\backend\mvnw.cmd test`
-- Inspect generated tables in local database.
-
-**Commit Message:**
-
-`feat: add flyway baseline schema for phase 1`
-
-## Task 4: Implement Identity Domain and Security Model
+## Task 1.1: Implement Identity Domain and Security Model
 
 **Objective:** Deliver authentication and authorization foundations required by every later module.
 
@@ -229,9 +142,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`feat: implement authentication and rbac foundation`
+`task 1.1: implement authentication and rbac foundation`
 
-## Task 5: Implement Catalog Module
+## Task 1.2: Implement Catalog Module
 
 **Objective:** Build the buyer-facing product data model and read APIs.
 
@@ -266,9 +179,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`feat: add catalog read APIs for products and variants`
+`task 1.2: add catalog read APIs for products and variants`
 
-## Task 6: Implement Inventory Module
+## Task 1.3: Implement Inventory Module
 
 **Objective:** Create stock control that is safe enough for checkout orchestration.
 
@@ -303,9 +216,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`feat: implement sku inventory and reservation lifecycle`
+`task 1.3: implement sku inventory and reservation lifecycle`
 
-## Task 7: Implement Cart Module
+## Task 1.4: Implement Cart Module
 
 **Objective:** Give buyers a persistent cart that references real variants.
 
@@ -340,9 +253,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`feat: add buyer cart management`
+`task 1.4: add buyer cart management`
 
-## Task 8: Implement Checkout Session Module
+## Task 1.5: Implement Checkout Session Module
 
 **Objective:** Transform a validated cart into a payment-ready checkout session.
 
@@ -376,9 +289,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`feat: implement checkout session creation and validation`
+`task 1.5: implement checkout session creation and validation`
 
-## Task 9: Implement Payment Module with Provider Abstraction
+## Task 1.6: Implement Payment Module with Provider Abstraction
 
 **Objective:** Integrate payment initiation without coupling business logic to a concrete provider too early.
 
@@ -414,9 +327,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`feat: add payment initiation and webhook processing`
+`task 1.6: add payment initiation and webhook processing`
 
-## Task 10: Implement Order Module
+## Task 1.7: Implement Order Module
 
 **Objective:** Confirm paid checkouts into orders and commit reserved stock.
 
@@ -451,9 +364,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`feat: confirm paid checkouts into orders`
+`task 1.7: confirm paid checkouts into orders`
 
-## Task 11: Implement Seller Application Workflow
+## Task 1.8: Implement Seller Application Workflow
 
 **Objective:** Add marketplace governance without full seller tooling yet.
 
@@ -488,9 +401,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`feat: implement seller application and approval workflow`
+`task 1.8: implement seller application and approval workflow`
 
-## Task 12: Implement Audit and Outbox Foundation
+## Task 1.9: Implement Audit and Outbox Foundation
 
 **Objective:** Add the minimum operational backbone needed for privileged and financial workflows.
 
@@ -524,9 +437,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`feat: add audit logging and outbox persistence foundation`
+`task 1.9: add audit logging and outbox persistence foundation`
 
-## Task 13: Tighten API Documentation and Error Contract
+## Task 1.10: Tighten API Documentation and Error Contract
 
 **Objective:** Ensure the implementation and docs remain synchronized.
 
@@ -550,9 +463,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`docs: align openapi contract with implemented phase 1 endpoints`
+`task 1.10: align openapi contract with implemented phase 1 endpoints`
 
-## Task 14: Add Operational Baseline
+## Task 1.11: Add Operational Baseline
 
 **Objective:** Make the project runnable and reviewable as a professional backend project.
 
@@ -578,9 +491,9 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`chore: add ci and operational delivery baseline`
+`task 1.11: add ci and operational delivery baseline`
 
-## Task 15: Final Phase 1 Verification and Cleanup
+## Task 1.12: Final Phase 1 Verification and Cleanup
 
 **Objective:** Prove the phase is coherent, runnable, and reviewable.
 
@@ -614,7 +527,7 @@ By the end of this plan, the repo should contain at minimum:
 
 **Commit Message:**
 
-`chore: finalize and verify phase 1 marketplace backend`
+`task 1.12: finalize and verify phase 1 marketplace backend`
 
 ## Definition of Done for This Plan
 
@@ -645,21 +558,19 @@ The following are intentionally not required to declare success for this file:
 
 ## Recommended Commit Sequence
 
-Apply commits in roughly this order:
+Starting from the current repository baseline, apply commits in roughly this order:
 
-1. `chore: establish application configuration baseline`
-2. `feat: add shared api and exception conventions`
-3. `feat: add flyway baseline schema for phase 1`
-4. `feat: implement authentication and rbac foundation`
-5. `feat: add catalog read APIs for products and variants`
-6. `feat: implement sku inventory and reservation lifecycle`
-7. `feat: add buyer cart management`
-8. `feat: implement checkout session creation and validation`
-9. `feat: add payment initiation and webhook processing`
-10. `feat: confirm paid checkouts into orders`
-11. `feat: implement seller application and approval workflow`
-12. `feat: add audit logging and outbox persistence foundation`
-13. `docs: align openapi contract with implemented phase 1 endpoints`
-14. `chore: add ci and operational delivery baseline`
-15. `chore: finalize and verify phase 1 marketplace backend`
+1. `task 1.1: implement authentication and rbac foundation`
+2. `task 1.2: add catalog read APIs for products and variants`
+3. `task 1.3: implement sku inventory and reservation lifecycle`
+4. `task 1.4: add buyer cart management`
+5. `task 1.5: implement checkout session creation and validation`
+6. `task 1.6: add payment initiation and webhook processing`
+7. `task 1.7: confirm paid checkouts into orders`
+8. `task 1.8: implement seller application and approval workflow`
+9. `task 1.9: add audit logging and outbox persistence foundation`
+10. `task 1.10: align openapi contract with implemented phase 1 endpoints`
+11. `task 1.11: add ci and operational delivery baseline`
+12. `task 1.12: finalize and verify phase 1 marketplace backend`
+
 

@@ -42,12 +42,15 @@ This plan is split into five execution programs:
 
 ### 1.4 Commit Message Convention
 
-- `chore: ...` for scaffolding, CI, config, baseline infra
-- `feat: ...` for new business capability
-- `test: ...` for test-only work
-- `docs: ...` for doc-only changes
-- `refactor: ...` for structural changes that preserve behavior
-- `fix: ...` for bug fixes discovered during execution
+- Primary commit subject format:
+  - `task <number>: <description>`
+- Examples:
+  - `task 0.1: establish backend foundation baseline`
+  - `task 1.1: implement identity and token lifecycle`
+  - `task 1.1.1: add user and refresh token entities`
+- Use one top-level task number when the commit cleanly maps to a single plan task.
+- Use a decimal subtask suffix when a task needs multiple commits but should still remain traceable to one numbered task.
+- Conventional categories such as `feat`, `fix`, or `docs` may still be used in PR descriptions or changelogs, but the commit subject itself should stay task-numbered.
 
 ### 1.5 Verification Commands
 
@@ -150,148 +153,57 @@ No controller should depend directly on entity internals. No module should reach
 
 ## 5. Program 0: Engineering Foundation
 
-### Task 0.1: Normalize Project Configuration
+Program 0 is already complete on the current `main` branch. In practice, the baseline was delivered in six task-numbered commits that grouped related foundation work more coarsely than the original draft breakdown. The sequence below is the canonical history that the repository now follows.
 
-**Objective:** Replace starter defaults with production-ready baseline configuration and environment separation.
+### Task 0.1: Establish Backend Foundation Baseline
+
+**Objective:** Bootstrap a runnable backend foundation that already includes the minimum engineering platform needed to start business module work.
 
 **Files:**
 
 - Modify: `backend/pom.xml`
-- Replace: `backend/src/main/resources/application.properties`
 - Create: `backend/src/main/resources/application.yml`
 - Create: `backend/src/main/resources/application-local.yml`
 - Create: `backend/src/main/resources/application-test.yml`
-- Create: `.env.example`
-- Create: `docker-compose.yml`
-
-**Steps:**
-
-1. Replace the default `application.properties` with YAML-based profile config.
-2. Add config sections for database, Redis, JWT, payment provider mock settings, inventory reservation TTL, and audit correlation settings.
-3. Add Docker Compose services for PostgreSQL and Redis.
-4. Add `.env.example` documenting expected variables.
-5. Add local defaults safe for development.
-
-**Verification:**
-
-- `.\backend\mvnw.cmd -q -DskipTests compile`
-- Start application with local profile
-
-**Commit Message:**
-
-`chore: establish production-style configuration baseline`
-
-### Task 0.2: Create Shared API and Error Conventions
-
-**Objective:** Standardize envelope, errors, validation handling, and correlation.
-
-**Files:**
-
-- Create: `backend/src/main/java/com/stridehub/common/api/ApiResponse.java`
-- Create: `backend/src/main/java/com/stridehub/common/api/ApiErrorResponse.java`
-- Create: `backend/src/main/java/com/stridehub/common/exception/BusinessException.java`
-- Create: `backend/src/main/java/com/stridehub/common/exception/NotFoundException.java`
-- Create: `backend/src/main/java/com/stridehub/common/exception/ConflictException.java`
-- Create: `backend/src/main/java/com/stridehub/common/exception/UnauthorizedActionException.java`
-- Create: `backend/src/main/java/com/stridehub/common/exception/GlobalExceptionHandler.java`
-- Create: `backend/src/main/java/com/stridehub/common/id/CorrelationIdFilter.java`
-- Create: `backend/src/main/java/com/stridehub/common/time/TimeProvider.java`
-- Create: `backend/src/main/java/com/stridehub/common/time/SystemTimeProvider.java`
-
-**Steps:**
-
-1. Define success and error envelopes.
-2. Add validation error flattening rules.
-3. Add correlation ID extraction or generation filter.
-4. Add time abstraction for expiry and scheduling tests.
-
-**Verification:**
-
-- Controller-slice tests for validation errors
-- Tests for correlation ID propagation
-
-**Commit Message:**
-
-`feat: add shared api, exception, and correlation conventions`
-
-### Task 0.3: Introduce Persistence Baseline and Flyway Migrations
-
-**Objective:** Create the first durable schema set and migration discipline.
-
-**Files:**
-
 - Create: `backend/src/main/resources/db/migration/V1__identity_catalog_core.sql`
 - Create: `backend/src/main/resources/db/migration/V2__commerce_flow.sql`
 - Create: `backend/src/main/resources/db/migration/V3__seller_admin_audit.sql`
+- Create: `backend/src/main/java/com/stridehub/common/...`
+- Create: `backend/src/main/java/com/stridehub/config/...`
+- Create: `backend/src/test/java/com/stridehub/config/SecurityConfigTest.java`
 - Create: `backend/src/test/java/com/stridehub/integration/FlywayMigrationTest.java`
+- Create: `.env.example`
+- Create: `docker-compose.yml`
 
-**Schema Scope:**
+**Delivered Scope:**
 
-- users, roles, user_roles, refresh_tokens, addresses
-- categories, brands, products, product_variants, product_images
-- inventory_items, inventory_reservations
-- carts, cart_items
-- checkout_sessions
-- payments, payment_attempts
-- orders, order_items, shipments
-- seller_profiles, seller_applications
-- audit_logs, outbox_events
-
-**Steps:**
-
-1. Use UUID primary keys everywhere.
-2. Add uniqueness for email, role code, product slug, variant SKU, and payment provider reference.
-3. Add indexes for reservation expiry, order creation time, audit correlation ID, and product listing status.
-4. Add baseline migration test.
+1. Profile-based configuration and environment baseline.
+2. Shared API response, error handling, correlation ID, and time abstractions.
+3. Flyway schema foundation with seed roles.
+4. Stateless security baseline and protected/public route tests.
 
 **Verification:**
 
 - `.\backend\mvnw.cmd test`
+- `.\backend\mvnw.cmd -q -DskipTests compile`
 
 **Commit Message:**
 
-`feat: add baseline relational schema and migration tests`
+`task 0.1: establish backend foundation baseline`
 
-### Task 0.4: Add Security Baseline
+### Task 0.2: Add CI Baseline and Quick-Start Instructions
 
-**Objective:** Establish security configuration before public endpoints expand.
-
-**Files:**
-
-- Create: `backend/src/main/java/com/stridehub/config/SecurityConfig.java`
-- Create: `backend/src/main/java/com/stridehub/config/JwtProperties.java`
-- Create: `backend/src/main/java/com/stridehub/config/SecurityBeansConfig.java`
-- Create: `backend/src/test/java/com/stridehub/config/SecurityConfigTest.java`
-
-**Steps:**
-
-1. Set default-deny security posture.
-2. Allow only explicit public routes.
-3. Wire JWT authentication filter chain.
-4. Ensure actuator exposure is intentionally configured.
-5. Add stateless security setup for API use.
-
-**Verification:**
-
-- Test public vs protected route behavior
-
-**Commit Message:**
-
-`feat: add stateless security baseline`
-
-### Task 0.5: Add Build Hygiene and CI Baseline
-
-**Objective:** Ensure the project can be built, tested, and reviewed consistently.
+**Objective:** Make the backend foundation buildable and reviewable in an automated pipeline.
 
 **Files:**
 
 - Create: `.github/workflows/build.yml`
 - Modify: `README.md`
 
-**Steps:**
+**Delivered Scope:**
 
-1. Add CI workflow for checkout, Java setup, test run, and compile run.
-2. Update README quick-start to reflect actual commands.
+1. GitHub Actions build workflow for backend compile and test.
+2. Root quick-start instructions aligned with the backend baseline.
 
 **Verification:**
 
@@ -300,7 +212,116 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`chore: add ci baseline and quick-start instructions`
+`task 0.2: add ci baseline and quick-start instructions`
+
+### Task 0.3: Align Foundation Docs with Implementation Baseline
+
+**Objective:** Clarify the difference between implemented baseline and planned target state before feature work expands.
+
+**Files:**
+
+- Modify: `docs/README.md`
+- Create: `docs/audits/2026-04-02-baseline-consistency-audit.md`
+- Modify: baseline planning and architecture documents as needed
+
+**Delivered Scope:**
+
+1. Baseline consistency audit.
+2. Explicit separation between implemented foundation and future-state plans.
+3. Foundation documentation aligned with actual Program 0 code.
+
+**Verification:**
+
+- Manual review of docs against the implemented backend baseline
+
+**Commit Message:**
+
+`task 0.3: align foundation docs with implementation baseline`
+
+### Task 0.4: Move Spring Boot Application into Backend Workspace
+
+**Objective:** Restructure the repository into a cleaner monorepo shape without breaking the backend.
+
+**Files:**
+
+- Move: `.mvn` to `backend/.mvn`
+- Move: `mvnw` to `backend/mvnw`
+- Move: `mvnw.cmd` to `backend/mvnw.cmd`
+- Move: `pom.xml` to `backend/pom.xml`
+- Move: `src/` to `backend/src/`
+- Create: `backend/README.md`
+
+**Delivered Scope:**
+
+1. Dedicated `backend/` workspace for the Spring Boot application.
+2. Backend README for workspace-local execution and verification.
+3. CORS and config adjustments needed for future buyer web integration.
+
+**Verification:**
+
+- `.\backend\mvnw.cmd test`
+- `.\backend\mvnw.cmd -q -DskipTests compile`
+
+**Commit Message:**
+
+`task 0.4: move spring boot application into backend workspace`
+
+### Task 0.5: Add Buyer Web Workspace Foundation
+
+**Objective:** Introduce a separate frontend workspace so the product can evolve as a full platform rather than a backend-only repo.
+
+**Files:**
+
+- Create: `frontend/`
+- Create: `package.json`
+- Create: `pnpm-workspace.yaml`
+- Create: `pnpm-lock.yaml`
+- Modify: `.gitignore`
+
+**Delivered Scope:**
+
+1. Vite + React buyer web workspace.
+2. Root pnpm workspace configuration.
+3. Initial buyer-facing shell aligned with the product direction.
+
+**Verification:**
+
+- `pnpm --dir frontend lint`
+- `pnpm --dir frontend build`
+
+**Commit Message:**
+
+`task 0.5: add buyer web workspace foundation`
+
+### Task 0.6: Align Monorepo Docs and CI Workflow
+
+**Objective:** Bring root documentation, plans, and CI configuration into line with the final `backend/` + `frontend/` monorepo layout.
+
+**Files:**
+
+- Modify: `.github/workflows/build.yml`
+- Modify: `README.md`
+- Modify: `docs/README.md`
+- Modify: `docs/audits/2026-04-02-baseline-consistency-audit.md`
+- Modify: `docs/plans/2026-04-02-stridehub-full-production-execution-plan.md`
+- Modify: `docs/plans/2026-04-02-stridehub-phase-1-execution-plan.md`
+
+**Delivered Scope:**
+
+1. Monorepo-aware CI workflow for backend and frontend.
+2. Root documentation aligned with workspace split.
+3. Plan files updated to point future implementation to `Task 1.1`.
+
+**Verification:**
+
+- `git status --short --branch`
+- `.\backend\mvnw.cmd test`
+- `pnpm --dir frontend lint`
+- `pnpm --dir frontend build`
+
+**Commit Message:**
+
+`task 0.6: align monorepo docs and ci workflow`
 
 ## 6. Program 1: Commerce Core
 
@@ -341,7 +362,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: implement identity and token lifecycle`
+`task 1.1: implement identity and token lifecycle`
 
 ### Task 1.2: Implement Catalog Domain
 
@@ -379,7 +400,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add catalog browsing and product detail endpoints`
+`task 1.2: add catalog browsing and product detail endpoints`
 
 ### Task 1.3: Implement Inventory Domain
 
@@ -415,7 +436,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: implement variant-level inventory reservations`
+`task 1.3: implement variant-level inventory reservations`
 
 ### Task 1.4: Implement Cart Module
 
@@ -451,7 +472,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add persistent buyer cart management`
+`task 1.4: add persistent buyer cart management`
 
 ### Task 1.5: Implement Checkout Session
 
@@ -487,7 +508,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: implement checkout sessions with stock reservation`
+`task 1.5: implement checkout sessions with stock reservation`
 
 ### Task 1.6: Implement Payment Module
 
@@ -524,7 +545,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: implement payment request and webhook confirmation`
+`task 1.6: implement payment request and webhook confirmation`
 
 ### Task 1.7: Implement Order Module
 
@@ -561,7 +582,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: confirm paid checkouts into orders`
+`task 1.7: confirm paid checkouts into orders`
 
 ## 7. Program 2: Marketplace Governance
 
@@ -596,7 +617,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add seller application workflow`
+`task 2.1: add seller application workflow`
 
 ### Task 2.2: Implement Admin Seller Decision Flow
 
@@ -629,7 +650,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: implement seller approval and suspension controls`
+`task 2.2: implement seller approval and suspension controls`
 
 ### Task 2.3: Implement Seller Product Management
 
@@ -662,7 +683,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add seller product draft and review submission flows`
+`task 2.3: add seller product draft and review submission flows`
 
 ### Task 2.4: Implement Admin Product Moderation
 
@@ -693,7 +714,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: implement product moderation workflow`
+`task 2.4: implement product moderation workflow`
 
 ### Task 2.5: Implement Seller Inventory Management
 
@@ -723,7 +744,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add seller inventory management endpoints`
+`task 2.5: add seller inventory management endpoints`
 
 ## 8. Program 3: Financial and Operational Integrity
 
@@ -754,7 +775,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add audit trail for privileged and financial actions`
+`task 3.1: add audit trail for privileged and financial actions`
 
 ### Task 3.2: Implement Outbox Pattern
 
@@ -783,7 +804,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: persist cross-module events through outbox`
+`task 3.2: persist cross-module events through outbox`
 
 ### Task 3.3: Implement Refund Domain
 
@@ -817,7 +838,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: implement refund request and state handling`
+`task 3.3: implement refund request and state handling`
 
 ### Task 3.4: Implement Reconciliation Hooks
 
@@ -847,7 +868,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add payment reconciliation hooks and mismatch detection`
+`task 3.4: add payment reconciliation hooks and mismatch detection`
 
 ### Task 3.5: Implement Support and Operations Search Endpoints
 
@@ -877,7 +898,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add support operations inspection and override tools`
+`task 3.5: add support operations inspection and override tools`
 
 ## 9. Program 4: Scale and Production Readiness
 
@@ -908,7 +929,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add notification integration boundary`
+`task 4.1: add notification integration boundary`
 
 ### Task 4.2: Add Metrics and Observability Baseline
 
@@ -941,7 +962,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add metrics and observability baseline`
+`task 4.2: add metrics and observability baseline`
 
 ### Task 4.3: Add Rate Limiting and Abuse Controls
 
@@ -971,7 +992,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`feat: add rate limiting for critical endpoints`
+`task 4.3: add rate limiting for critical endpoints`
 
 ### Task 4.4: Add Data Seeding and Demo Fixtures
 
@@ -998,7 +1019,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`chore: add reference seed data for local review`
+`task 4.4: add reference seed data for local review`
 
 ### Task 4.5: Add Production-Grade Documentation Alignment
 
@@ -1025,7 +1046,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Commit Message:**
 
-`docs: align operational and api documentation with implementation`
+`task 4.5: align operational and api documentation with implementation`
 
 ## 10. End-to-End Scenario Suite
 
@@ -1126,33 +1147,34 @@ Then verify manually:
 
 ## 13. Recommended Commit Sequence
 
-1. `chore: establish production-style configuration baseline`
-2. `feat: add shared api, exception, and correlation conventions`
-3. `feat: add baseline relational schema and migration tests`
-4. `feat: add stateless security baseline`
-5. `chore: add ci baseline and quick-start instructions`
-6. `feat: implement identity and token lifecycle`
-7. `feat: add catalog browsing and product detail endpoints`
-8. `feat: implement variant-level inventory reservations`
-9. `feat: add persistent buyer cart management`
-10. `feat: implement checkout sessions with stock reservation`
-11. `feat: implement payment request and webhook confirmation`
-12. `feat: confirm paid checkouts into orders`
-13. `feat: add seller application workflow`
-14. `feat: implement seller approval and suspension controls`
-15. `feat: add seller product draft and review submission flows`
-16. `feat: implement product moderation workflow`
-17. `feat: add seller inventory management endpoints`
-18. `feat: add audit trail for privileged and financial actions`
-19. `feat: persist cross-module events through outbox`
-20. `feat: implement refund request and state handling`
-21. `feat: add payment reconciliation hooks and mismatch detection`
-22. `feat: add support operations inspection and override tools`
-23. `feat: add notification integration boundary`
-24. `feat: add metrics and observability baseline`
-25. `feat: add rate limiting for critical endpoints`
-26. `chore: add reference seed data for local review`
-27. `docs: align operational and api documentation with implementation`
+1. `task 0.1: establish backend foundation baseline`
+2. `task 0.2: add ci baseline and quick-start instructions`
+3. `task 0.3: align foundation docs with implementation baseline`
+4. `task 0.4: move spring boot application into backend workspace`
+5. `task 0.5: add buyer web workspace foundation`
+6. `task 0.6: align monorepo docs and ci workflow`
+7. `task 1.1: implement identity and token lifecycle`
+8. `task 1.2: add catalog browsing and product detail endpoints`
+9. `task 1.3: implement variant-level inventory reservations`
+10. `task 1.4: add persistent buyer cart management`
+11. `task 1.5: implement checkout sessions with stock reservation`
+12. `task 1.6: implement payment request and webhook confirmation`
+13. `task 1.7: confirm paid checkouts into orders`
+14. `task 2.1: add seller application workflow`
+15. `task 2.2: implement seller approval and suspension controls`
+16. `task 2.3: add seller product draft and review submission flows`
+17. `task 2.4: implement product moderation workflow`
+18. `task 2.5: add seller inventory management endpoints`
+19. `task 3.1: add audit trail for privileged and financial actions`
+20. `task 3.2: persist cross-module events through outbox`
+21. `task 3.3: implement refund request and state handling`
+22. `task 3.4: add payment reconciliation hooks and mismatch detection`
+23. `task 3.5: add support operations inspection and override tools`
+24. `task 4.1: add notification integration boundary`
+25. `task 4.2: add metrics and observability baseline`
+26. `task 4.3: add rate limiting for critical endpoints`
+27. `task 4.4: add reference seed data for local review`
+28. `task 4.5: align operational and api documentation with implementation`
 
 ## 14. What Is Intentionally Deferred Beyond This Plan
 
@@ -1164,4 +1186,5 @@ The following remain outside this full production plan and should only be added 
 - dedicated search service extraction
 - warehouse routing engine
 - international pricing and tax complexity
+
 

@@ -98,4 +98,5 @@ This repository currently combines two documentation modes:
 - Mermaid diagrams are used so architecture and workflows remain version-controlled and diff-friendly.
 - ADRs capture decisions that materially affect implementation or operations.
 - API documentation follows an OpenAPI-first approach.
+- Commit history is expected to follow plan-linked numbering such as `task 0.6: ...` or `task 1.1.2: ...` so implementation remains traceable to execution plans.
 - Files under `plans/` describe intended delivery order; they are not claims that every item is already implemented.
