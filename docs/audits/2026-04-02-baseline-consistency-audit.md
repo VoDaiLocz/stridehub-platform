@@ -12,10 +12,13 @@ explicit.
 
 Reviewed artifacts:
 
-- `pom.xml`
-- `src/main/resources/application*.yml`
+- `backend/pom.xml`
+- `backend/src/main/resources/application*.yml`
+- `frontend/*`
 - `docker-compose.yml`
 - `.github/workflows/build.yml`
+- `package.json`
+- `pnpm-workspace.yaml`
 - `README.md`
 - `docs/README.md`
 - `docs/architecture.md`
@@ -31,6 +34,12 @@ The repository is now consistent at the foundation level, but several
 forward-looking documents still describe later business phases. Those documents
 are acceptable as long as they are treated as planned work rather than shipped
 behavior.
+
+The repository now uses a monorepo shape:
+
+- `backend/` contains the Spring Boot commerce API
+- `frontend/` contains the buyer-facing web workspace
+- root contains shared docs, CI, workspace orchestration, and local infrastructure
 
 ## 4. Resolved Inconsistencies
 
@@ -112,6 +121,20 @@ Resolution:
 - Added Mailpit and MinIO to `docker-compose.yml`.
 - Documented that these services are provisioned for local development, but the
   application has not yet integrated them in business modules.
+
+### 4.7 Repository Layout Needed to Match Product Direction
+
+Previous issue:
+
+- The repo held only a root Spring Boot app, while the product direction now
+  requires both backend and buyer-facing web delivery.
+
+Resolution:
+
+- Moved the Spring Boot application into `backend/`.
+- Added `frontend/` as a separate buyer web workspace.
+- Updated root orchestration, CI, and repository documentation to describe the
+  platform as a monorepo rather than a single backend application.
 
 ## 5. Remaining Intentional Gaps
 

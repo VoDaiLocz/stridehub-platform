@@ -1,6 +1,6 @@
 # StrideHub Documentation
 
-StrideHub is a production-style, backend-heavy `multi-vendor footwear marketplace` designed as a modular monolith. This documentation set is written to resemble a real engineering documentation package used for product delivery, architecture review, implementation planning, and operations handoff.
+StrideHub is a production-style `multi-vendor footwear marketplace` delivered as a monorepo with separate backend and frontend workspaces. This documentation set is written to resemble a real engineering documentation package used for product delivery, architecture review, implementation planning, and operations handoff.
 
 ## Documentation Map
 
@@ -41,6 +41,7 @@ This repository currently combines two documentation modes:
 ### Implemented Baseline
 
 - Program 0 engineering foundation
+- monorepo repository split with `backend/` and `frontend/`
 - runtime configuration and environment setup
 - baseline schema migrations
 - security and request-correlation foundation

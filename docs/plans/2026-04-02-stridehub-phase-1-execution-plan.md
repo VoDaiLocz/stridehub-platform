@@ -8,6 +8,10 @@
 
 **Tech Stack:** Java 21, Spring Boot, Spring Security, Spring Data JPA, Flyway, PostgreSQL, Redis, Bean Validation, Actuator, OpenAPI, JUnit 5, Spring Boot Test, Testcontainers.
 
+**Repository Layout Note:** The repository now uses `backend/` for the Spring Boot application and `frontend/` for the buyer web workspace. Backend file paths below should be read relative to `backend/`.
+
+**Current Baseline Status:** The current `main` branch already includes the project baseline, shared platform layer, database migrations, CI baseline, and monorepo split. When continuing from the repository as it exists today, start implementation from **Task 4** in this document. Tasks 1-3 remain here for traceability and for fresh rebuild scenarios.
+
 ---
 
 ## Delivery Rules
@@ -24,18 +28,18 @@
 
 All production code should live under:
 
-- `src/main/java/com/stridehub/common`
-- `src/main/java/com/stridehub/config`
-- `src/main/java/com/stridehub/identity`
-- `src/main/java/com/stridehub/catalog`
-- `src/main/java/com/stridehub/inventory`
-- `src/main/java/com/stridehub/cart`
-- `src/main/java/com/stridehub/checkout`
-- `src/main/java/com/stridehub/payment`
-- `src/main/java/com/stridehub/order`
-- `src/main/java/com/stridehub/seller`
-- `src/main/java/com/stridehub/admin`
-- `src/main/java/com/stridehub/audit`
+- `backend/src/main/java/com/stridehub/common`
+- `backend/src/main/java/com/stridehub/config`
+- `backend/src/main/java/com/stridehub/identity`
+- `backend/src/main/java/com/stridehub/catalog`
+- `backend/src/main/java/com/stridehub/inventory`
+- `backend/src/main/java/com/stridehub/cart`
+- `backend/src/main/java/com/stridehub/checkout`
+- `backend/src/main/java/com/stridehub/payment`
+- `backend/src/main/java/com/stridehub/order`
+- `backend/src/main/java/com/stridehub/seller`
+- `backend/src/main/java/com/stridehub/admin`
+- `backend/src/main/java/com/stridehub/audit`
 
 Each module should follow this internal structure where applicable:
 
@@ -59,27 +63,28 @@ Each module should follow this internal structure where applicable:
 Use these commands repeatedly through the plan:
 
 ```powershell
-.\mvnw.cmd test
-.\mvnw.cmd -q -DskipTests compile
-.\mvnw.cmd spring-boot:run
+.\backend\mvnw.cmd test
+.\backend\mvnw.cmd -q -DskipTests compile
+.\backend\mvnw.cmd spring-boot:run
 ```
 
 If Docker is available later:
 
 ```powershell
 docker compose up -d
-.\mvnw.cmd test
+.\backend\mvnw.cmd test
 ```
 
 ## Recommended Directory Outputs
 
 By the end of this plan, the repo should contain at minimum:
 
-- `src/main/java/com/stridehub/...`
-- `src/main/resources/application.yml`
-- `src/main/resources/application-local.yml`
-- `src/main/resources/db/migration/...`
-- `src/test/java/com/stridehub/...`
+- `backend/src/main/java/com/stridehub/...`
+- `backend/src/main/resources/application.yml`
+- `backend/src/main/resources/application-local.yml`
+- `backend/src/main/resources/db/migration/...`
+- `backend/src/test/java/com/stridehub/...`
+- `frontend/src/...`
 - `docker-compose.yml`
 - `.env.example`
 
@@ -89,11 +94,11 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Modify: `pom.xml`
-- Modify: `src/main/resources/application.properties`
-- Create: `src/main/resources/application.yml`
-- Create: `src/main/resources/application-local.yml`
-- Create: `src/main/resources/application-test.yml`
+- Modify: `backend/pom.xml`
+- Modify: `backend/src/main/resources/application.properties`
+- Create: `backend/src/main/resources/application.yml`
+- Create: `backend/src/main/resources/application-local.yml`
+- Create: `backend/src/main/resources/application-test.yml`
 - Create: `.env.example`
 - Create: `docker-compose.yml`
 
@@ -107,7 +112,7 @@ By the end of this plan, the repo should contain at minimum:
 
 **Verification:**
 
-- `.\mvnw.cmd -q -DskipTests compile`
+- `.\backend\mvnw.cmd -q -DskipTests compile`
 - Confirm application config loads without placeholder resolution failures.
 
 **Commit Message:**
@@ -120,15 +125,15 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/common/api/ApiErrorResponse.java`
-- Create: `src/main/java/com/stridehub/common/api/ApiResponse.java`
-- Create: `src/main/java/com/stridehub/common/exception/GlobalExceptionHandler.java`
-- Create: `src/main/java/com/stridehub/common/exception/BusinessException.java`
-- Create: `src/main/java/com/stridehub/common/exception/NotFoundException.java`
-- Create: `src/main/java/com/stridehub/common/exception/ConflictException.java`
-- Create: `src/main/java/com/stridehub/common/time/TimeProvider.java`
-- Create: `src/main/java/com/stridehub/common/time/SystemTimeProvider.java`
-- Create: `src/main/java/com/stridehub/common/id/CorrelationIdFilter.java`
+- Create: `backend/src/main/java/com/stridehub/common/api/ApiErrorResponse.java`
+- Create: `backend/src/main/java/com/stridehub/common/api/ApiResponse.java`
+- Create: `backend/src/main/java/com/stridehub/common/exception/GlobalExceptionHandler.java`
+- Create: `backend/src/main/java/com/stridehub/common/exception/BusinessException.java`
+- Create: `backend/src/main/java/com/stridehub/common/exception/NotFoundException.java`
+- Create: `backend/src/main/java/com/stridehub/common/exception/ConflictException.java`
+- Create: `backend/src/main/java/com/stridehub/common/time/TimeProvider.java`
+- Create: `backend/src/main/java/com/stridehub/common/time/SystemTimeProvider.java`
+- Create: `backend/src/main/java/com/stridehub/common/id/CorrelationIdFilter.java`
 
 **Implementation Steps:**
 
@@ -140,7 +145,7 @@ By the end of this plan, the repo should contain at minimum:
 **Verification:**
 
 - Add controller-slice tests for validation and error envelope behavior.
-- `.\mvnw.cmd test`
+- `.\backend\mvnw.cmd test`
 
 **Commit Message:**
 
@@ -152,10 +157,10 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/resources/db/migration/V1__baseline_identity_and_catalog.sql`
-- Create: `src/main/resources/db/migration/V2__commerce_core.sql`
-- Create: `src/main/resources/db/migration/V3__seller_and_audit.sql`
-- Create: `src/test/java/com/stridehub/integration/FlywayMigrationTest.java`
+- Create: `backend/src/main/resources/db/migration/V1__baseline_identity_and_catalog.sql`
+- Create: `backend/src/main/resources/db/migration/V2__commerce_core.sql`
+- Create: `backend/src/main/resources/db/migration/V3__seller_and_audit.sql`
+- Create: `backend/src/test/java/com/stridehub/integration/FlywayMigrationTest.java`
 
 **Schema Scope:**
 
@@ -176,7 +181,7 @@ By the end of this plan, the repo should contain at minimum:
 
 **Verification:**
 
-- `.\mvnw.cmd test`
+- `.\backend\mvnw.cmd test`
 - Inspect generated tables in local database.
 
 **Commit Message:**
@@ -189,14 +194,14 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/identity/domain/...`
-- Create: `src/main/java/com/stridehub/identity/infrastructure/...`
-- Create: `src/main/java/com/stridehub/identity/application/...`
-- Create: `src/main/java/com/stridehub/config/SecurityConfig.java`
-- Create: `src/main/java/com/stridehub/config/JwtProperties.java`
-- Create: `src/main/java/com/stridehub/identity/web/AuthController.java`
-- Create: `src/main/java/com/stridehub/identity/web/MeController.java`
-- Create: `src/test/java/com/stridehub/identity/...`
+- Create: `backend/src/main/java/com/stridehub/identity/domain/...`
+- Create: `backend/src/main/java/com/stridehub/identity/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/identity/application/...`
+- Create: `backend/src/main/java/com/stridehub/config/SecurityConfig.java`
+- Create: `backend/src/main/java/com/stridehub/config/JwtProperties.java`
+- Create: `backend/src/main/java/com/stridehub/identity/web/AuthController.java`
+- Create: `backend/src/main/java/com/stridehub/identity/web/MeController.java`
+- Create: `backend/src/test/java/com/stridehub/identity/...`
 
 **Required Features:**
 
@@ -232,11 +237,11 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/catalog/domain/...`
-- Create: `src/main/java/com/stridehub/catalog/application/...`
-- Create: `src/main/java/com/stridehub/catalog/infrastructure/...`
-- Create: `src/main/java/com/stridehub/catalog/web/CatalogController.java`
-- Create: `src/test/java/com/stridehub/catalog/...`
+- Create: `backend/src/main/java/com/stridehub/catalog/domain/...`
+- Create: `backend/src/main/java/com/stridehub/catalog/application/...`
+- Create: `backend/src/main/java/com/stridehub/catalog/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/catalog/web/CatalogController.java`
+- Create: `backend/src/test/java/com/stridehub/catalog/...`
 
 **Required Features:**
 
@@ -269,10 +274,10 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/inventory/domain/...`
-- Create: `src/main/java/com/stridehub/inventory/application/...`
-- Create: `src/main/java/com/stridehub/inventory/infrastructure/...`
-- Create: `src/test/java/com/stridehub/inventory/...`
+- Create: `backend/src/main/java/com/stridehub/inventory/domain/...`
+- Create: `backend/src/main/java/com/stridehub/inventory/application/...`
+- Create: `backend/src/main/java/com/stridehub/inventory/infrastructure/...`
+- Create: `backend/src/test/java/com/stridehub/inventory/...`
 
 **Required Features:**
 
@@ -306,11 +311,11 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/cart/domain/...`
-- Create: `src/main/java/com/stridehub/cart/application/...`
-- Create: `src/main/java/com/stridehub/cart/infrastructure/...`
-- Create: `src/main/java/com/stridehub/cart/web/CartController.java`
-- Create: `src/test/java/com/stridehub/cart/...`
+- Create: `backend/src/main/java/com/stridehub/cart/domain/...`
+- Create: `backend/src/main/java/com/stridehub/cart/application/...`
+- Create: `backend/src/main/java/com/stridehub/cart/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/cart/web/CartController.java`
+- Create: `backend/src/test/java/com/stridehub/cart/...`
 
 **Required Features:**
 
@@ -343,11 +348,11 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/checkout/domain/...`
-- Create: `src/main/java/com/stridehub/checkout/application/...`
-- Create: `src/main/java/com/stridehub/checkout/infrastructure/...`
-- Create: `src/main/java/com/stridehub/checkout/web/CheckoutController.java`
-- Create: `src/test/java/com/stridehub/checkout/...`
+- Create: `backend/src/main/java/com/stridehub/checkout/domain/...`
+- Create: `backend/src/main/java/com/stridehub/checkout/application/...`
+- Create: `backend/src/main/java/com/stridehub/checkout/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/checkout/web/CheckoutController.java`
+- Create: `backend/src/test/java/com/stridehub/checkout/...`
 
 **Required Features:**
 
@@ -379,12 +384,12 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/payment/domain/...`
-- Create: `src/main/java/com/stridehub/payment/application/...`
-- Create: `src/main/java/com/stridehub/payment/infrastructure/provider/PaymentProvider.java`
-- Create: `src/main/java/com/stridehub/payment/infrastructure/provider/MockPaymentProvider.java`
-- Create: `src/main/java/com/stridehub/payment/web/PaymentWebhookController.java`
-- Create: `src/test/java/com/stridehub/payment/...`
+- Create: `backend/src/main/java/com/stridehub/payment/domain/...`
+- Create: `backend/src/main/java/com/stridehub/payment/application/...`
+- Create: `backend/src/main/java/com/stridehub/payment/infrastructure/provider/PaymentProvider.java`
+- Create: `backend/src/main/java/com/stridehub/payment/infrastructure/provider/MockPaymentProvider.java`
+- Create: `backend/src/main/java/com/stridehub/payment/web/PaymentWebhookController.java`
+- Create: `backend/src/test/java/com/stridehub/payment/...`
 
 **Required Features:**
 
@@ -417,11 +422,11 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/order/domain/...`
-- Create: `src/main/java/com/stridehub/order/application/...`
-- Create: `src/main/java/com/stridehub/order/infrastructure/...`
-- Create: `src/main/java/com/stridehub/order/web/OrderController.java`
-- Create: `src/test/java/com/stridehub/order/...`
+- Create: `backend/src/main/java/com/stridehub/order/domain/...`
+- Create: `backend/src/main/java/com/stridehub/order/application/...`
+- Create: `backend/src/main/java/com/stridehub/order/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/order/web/OrderController.java`
+- Create: `backend/src/test/java/com/stridehub/order/...`
 
 **Required Features:**
 
@@ -454,12 +459,12 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/seller/domain/...`
-- Create: `src/main/java/com/stridehub/seller/application/...`
-- Create: `src/main/java/com/stridehub/seller/infrastructure/...`
-- Create: `src/main/java/com/stridehub/seller/web/SellerApplicationController.java`
-- Create: `src/main/java/com/stridehub/admin/web/AdminSellerController.java`
-- Create: `src/test/java/com/stridehub/seller/...`
+- Create: `backend/src/main/java/com/stridehub/seller/domain/...`
+- Create: `backend/src/main/java/com/stridehub/seller/application/...`
+- Create: `backend/src/main/java/com/stridehub/seller/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/seller/web/SellerApplicationController.java`
+- Create: `backend/src/main/java/com/stridehub/admin/web/AdminSellerController.java`
+- Create: `backend/src/test/java/com/stridehub/seller/...`
 
 **Required Features:**
 
@@ -491,11 +496,11 @@ By the end of this plan, the repo should contain at minimum:
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/audit/domain/...`
-- Create: `src/main/java/com/stridehub/audit/application/...`
-- Create: `src/main/java/com/stridehub/audit/infrastructure/...`
-- Create: `src/main/java/com/stridehub/common/events/...`
-- Create: `src/test/java/com/stridehub/audit/...`
+- Create: `backend/src/main/java/com/stridehub/audit/domain/...`
+- Create: `backend/src/main/java/com/stridehub/audit/application/...`
+- Create: `backend/src/main/java/com/stridehub/audit/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/common/events/...`
+- Create: `backend/src/test/java/com/stridehub/audit/...`
 
 **Required Features:**
 
@@ -528,8 +533,8 @@ By the end of this plan, the repo should contain at minimum:
 **Files:**
 
 - Modify: `docs/api/openapi.yaml`
-- Modify: any controller DTO package under `src/main/java/com/stridehub/**/web`
-- Create: `src/test/java/com/stridehub/contracts/...`
+- Modify: any controller DTO package under `backend/src/main/java/com/stridehub/**/web`
+- Create: `backend/src/test/java/com/stridehub/contracts/...`
 
 **Implementation Steps:**
 
@@ -568,7 +573,7 @@ By the end of this plan, the repo should contain at minimum:
 
 **Verification:**
 
-- `.\mvnw.cmd test`
+- `.\backend\mvnw.cmd test`
 - review CI YAML for syntax correctness
 
 **Commit Message:**
@@ -602,9 +607,9 @@ By the end of this plan, the repo should contain at minimum:
 **Verification:**
 
 ```powershell
-.\mvnw.cmd test
-.\mvnw.cmd -q -DskipTests compile
-.\mvnw.cmd spring-boot:run
+.\backend\mvnw.cmd test
+.\backend\mvnw.cmd -q -DskipTests compile
+.\backend\mvnw.cmd spring-boot:run
 ```
 
 **Commit Message:**
@@ -657,3 +662,4 @@ Apply commits in roughly this order:
 13. `docs: align openapi contract with implemented phase 1 endpoints`
 14. `chore: add ci and operational delivery baseline`
 15. `chore: finalize and verify phase 1 marketplace backend`
+

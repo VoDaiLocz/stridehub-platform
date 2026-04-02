@@ -8,6 +8,10 @@
 
 **Tech Stack:** Java 21, Spring Boot, Spring Security, Spring Data JPA, Flyway, PostgreSQL, Redis, Bean Validation, Actuator, OpenAPI, JUnit 5, Spring Boot Test, Testcontainers, Docker Compose, GitHub Actions, OpenTelemetry-ready instrumentation.
 
+**Repository Layout Note:** The repository now uses a monorepo shape with `backend/` for the Spring Boot application and `frontend/` for the buyer web workspace. Unless explicitly stated otherwise, backend file paths below should be read relative to `backend/`.
+
+**Current Baseline Status:** Program 0 has already been implemented on the current `main` branch, including configuration profiles, shared API conventions, baseline schema migrations, security baseline, CI, and the `backend/` + `frontend/` monorepo structure. When executing from the current repository state, the next actionable task is **Program 1 / Task 1.1**. Program 0 remains documented here as the implementation record and rebuild guide.
+
 ---
 
 ## 1. Plan Usage Rules
@@ -50,9 +54,9 @@ This plan is split into five execution programs:
 Run these throughout delivery:
 
 ```powershell
-.\mvnw.cmd test
-.\mvnw.cmd -q -DskipTests compile
-.\mvnw.cmd spring-boot:run
+.\backend\mvnw.cmd test
+.\backend\mvnw.cmd -q -DskipTests compile
+.\backend\mvnw.cmd spring-boot:run
 git status --short --branch
 ```
 
@@ -60,29 +64,30 @@ When Docker is available:
 
 ```powershell
 docker compose up -d
-.\mvnw.cmd test
+.\backend\mvnw.cmd test
 ```
 
 ## 2. Target Repository Shape
 
 By the end of full plan execution, the repository should contain at minimum:
 
-- `src/main/java/com/stridehub/common`
-- `src/main/java/com/stridehub/config`
-- `src/main/java/com/stridehub/identity`
-- `src/main/java/com/stridehub/catalog`
-- `src/main/java/com/stridehub/inventory`
-- `src/main/java/com/stridehub/cart`
-- `src/main/java/com/stridehub/checkout`
-- `src/main/java/com/stridehub/payment`
-- `src/main/java/com/stridehub/order`
-- `src/main/java/com/stridehub/seller`
-- `src/main/java/com/stridehub/admin`
-- `src/main/java/com/stridehub/refund`
-- `src/main/java/com/stridehub/audit`
-- `src/main/java/com/stridehub/notification`
-- `src/main/resources/db/migration`
-- `src/test/java/com/stridehub`
+- `backend/src/main/java/com/stridehub/common`
+- `backend/src/main/java/com/stridehub/config`
+- `backend/src/main/java/com/stridehub/identity`
+- `backend/src/main/java/com/stridehub/catalog`
+- `backend/src/main/java/com/stridehub/inventory`
+- `backend/src/main/java/com/stridehub/cart`
+- `backend/src/main/java/com/stridehub/checkout`
+- `backend/src/main/java/com/stridehub/payment`
+- `backend/src/main/java/com/stridehub/order`
+- `backend/src/main/java/com/stridehub/seller`
+- `backend/src/main/java/com/stridehub/admin`
+- `backend/src/main/java/com/stridehub/refund`
+- `backend/src/main/java/com/stridehub/audit`
+- `backend/src/main/java/com/stridehub/notification`
+- `backend/src/main/resources/db/migration`
+- `backend/src/test/java/com/stridehub`
+- `frontend/src`
 - `docs/*`
 - `.github/workflows/*`
 - `docker-compose.yml`
@@ -151,11 +156,11 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Modify: `pom.xml`
-- Replace: `src/main/resources/application.properties`
-- Create: `src/main/resources/application.yml`
-- Create: `src/main/resources/application-local.yml`
-- Create: `src/main/resources/application-test.yml`
+- Modify: `backend/pom.xml`
+- Replace: `backend/src/main/resources/application.properties`
+- Create: `backend/src/main/resources/application.yml`
+- Create: `backend/src/main/resources/application-local.yml`
+- Create: `backend/src/main/resources/application-test.yml`
 - Create: `.env.example`
 - Create: `docker-compose.yml`
 
@@ -169,7 +174,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Verification:**
 
-- `.\mvnw.cmd -q -DskipTests compile`
+- `.\backend\mvnw.cmd -q -DskipTests compile`
 - Start application with local profile
 
 **Commit Message:**
@@ -182,16 +187,16 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/common/api/ApiResponse.java`
-- Create: `src/main/java/com/stridehub/common/api/ApiErrorResponse.java`
-- Create: `src/main/java/com/stridehub/common/exception/BusinessException.java`
-- Create: `src/main/java/com/stridehub/common/exception/NotFoundException.java`
-- Create: `src/main/java/com/stridehub/common/exception/ConflictException.java`
-- Create: `src/main/java/com/stridehub/common/exception/UnauthorizedActionException.java`
-- Create: `src/main/java/com/stridehub/common/exception/GlobalExceptionHandler.java`
-- Create: `src/main/java/com/stridehub/common/id/CorrelationIdFilter.java`
-- Create: `src/main/java/com/stridehub/common/time/TimeProvider.java`
-- Create: `src/main/java/com/stridehub/common/time/SystemTimeProvider.java`
+- Create: `backend/src/main/java/com/stridehub/common/api/ApiResponse.java`
+- Create: `backend/src/main/java/com/stridehub/common/api/ApiErrorResponse.java`
+- Create: `backend/src/main/java/com/stridehub/common/exception/BusinessException.java`
+- Create: `backend/src/main/java/com/stridehub/common/exception/NotFoundException.java`
+- Create: `backend/src/main/java/com/stridehub/common/exception/ConflictException.java`
+- Create: `backend/src/main/java/com/stridehub/common/exception/UnauthorizedActionException.java`
+- Create: `backend/src/main/java/com/stridehub/common/exception/GlobalExceptionHandler.java`
+- Create: `backend/src/main/java/com/stridehub/common/id/CorrelationIdFilter.java`
+- Create: `backend/src/main/java/com/stridehub/common/time/TimeProvider.java`
+- Create: `backend/src/main/java/com/stridehub/common/time/SystemTimeProvider.java`
 
 **Steps:**
 
@@ -215,10 +220,10 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/resources/db/migration/V1__identity_catalog_core.sql`
-- Create: `src/main/resources/db/migration/V2__commerce_flow.sql`
-- Create: `src/main/resources/db/migration/V3__seller_admin_audit.sql`
-- Create: `src/test/java/com/stridehub/integration/FlywayMigrationTest.java`
+- Create: `backend/src/main/resources/db/migration/V1__identity_catalog_core.sql`
+- Create: `backend/src/main/resources/db/migration/V2__commerce_flow.sql`
+- Create: `backend/src/main/resources/db/migration/V3__seller_admin_audit.sql`
+- Create: `backend/src/test/java/com/stridehub/integration/FlywayMigrationTest.java`
 
 **Schema Scope:**
 
@@ -241,7 +246,7 @@ No controller should depend directly on entity internals. No module should reach
 
 **Verification:**
 
-- `.\mvnw.cmd test`
+- `.\backend\mvnw.cmd test`
 
 **Commit Message:**
 
@@ -253,10 +258,10 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/config/SecurityConfig.java`
-- Create: `src/main/java/com/stridehub/config/JwtProperties.java`
-- Create: `src/main/java/com/stridehub/config/SecurityBeansConfig.java`
-- Create: `src/test/java/com/stridehub/config/SecurityConfigTest.java`
+- Create: `backend/src/main/java/com/stridehub/config/SecurityConfig.java`
+- Create: `backend/src/main/java/com/stridehub/config/JwtProperties.java`
+- Create: `backend/src/main/java/com/stridehub/config/SecurityBeansConfig.java`
+- Create: `backend/src/test/java/com/stridehub/config/SecurityConfigTest.java`
 
 **Steps:**
 
@@ -291,7 +296,7 @@ No controller should depend directly on entity internals. No module should reach
 **Verification:**
 
 - Review workflow syntax
-- Run local `.\mvnw.cmd test`
+- Run local `.\backend\mvnw.cmd test`
 
 **Commit Message:**
 
@@ -305,12 +310,12 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/identity/domain/...`
-- Create: `src/main/java/com/stridehub/identity/application/...`
-- Create: `src/main/java/com/stridehub/identity/infrastructure/...`
-- Create: `src/main/java/com/stridehub/identity/web/AuthController.java`
-- Create: `src/main/java/com/stridehub/identity/web/MeController.java`
-- Create: `src/test/java/com/stridehub/identity/...`
+- Create: `backend/src/main/java/com/stridehub/identity/domain/...`
+- Create: `backend/src/main/java/com/stridehub/identity/application/...`
+- Create: `backend/src/main/java/com/stridehub/identity/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/identity/web/AuthController.java`
+- Create: `backend/src/main/java/com/stridehub/identity/web/MeController.java`
+- Create: `backend/src/test/java/com/stridehub/identity/...`
 
 **Capabilities:**
 
@@ -344,11 +349,11 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/catalog/domain/...`
-- Create: `src/main/java/com/stridehub/catalog/application/...`
-- Create: `src/main/java/com/stridehub/catalog/infrastructure/...`
-- Create: `src/main/java/com/stridehub/catalog/web/CatalogController.java`
-- Create: `src/test/java/com/stridehub/catalog/...`
+- Create: `backend/src/main/java/com/stridehub/catalog/domain/...`
+- Create: `backend/src/main/java/com/stridehub/catalog/application/...`
+- Create: `backend/src/main/java/com/stridehub/catalog/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/catalog/web/CatalogController.java`
+- Create: `backend/src/test/java/com/stridehub/catalog/...`
 
 **Capabilities:**
 
@@ -382,10 +387,10 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/inventory/domain/...`
-- Create: `src/main/java/com/stridehub/inventory/application/...`
-- Create: `src/main/java/com/stridehub/inventory/infrastructure/...`
-- Create: `src/test/java/com/stridehub/inventory/...`
+- Create: `backend/src/main/java/com/stridehub/inventory/domain/...`
+- Create: `backend/src/main/java/com/stridehub/inventory/application/...`
+- Create: `backend/src/main/java/com/stridehub/inventory/infrastructure/...`
+- Create: `backend/src/test/java/com/stridehub/inventory/...`
 
 **Capabilities:**
 
@@ -418,11 +423,11 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/cart/domain/...`
-- Create: `src/main/java/com/stridehub/cart/application/...`
-- Create: `src/main/java/com/stridehub/cart/infrastructure/...`
-- Create: `src/main/java/com/stridehub/cart/web/CartController.java`
-- Create: `src/test/java/com/stridehub/cart/...`
+- Create: `backend/src/main/java/com/stridehub/cart/domain/...`
+- Create: `backend/src/main/java/com/stridehub/cart/application/...`
+- Create: `backend/src/main/java/com/stridehub/cart/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/cart/web/CartController.java`
+- Create: `backend/src/test/java/com/stridehub/cart/...`
 
 **Capabilities:**
 
@@ -454,11 +459,11 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/checkout/domain/...`
-- Create: `src/main/java/com/stridehub/checkout/application/...`
-- Create: `src/main/java/com/stridehub/checkout/infrastructure/...`
-- Create: `src/main/java/com/stridehub/checkout/web/CheckoutController.java`
-- Create: `src/test/java/com/stridehub/checkout/...`
+- Create: `backend/src/main/java/com/stridehub/checkout/domain/...`
+- Create: `backend/src/main/java/com/stridehub/checkout/application/...`
+- Create: `backend/src/main/java/com/stridehub/checkout/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/checkout/web/CheckoutController.java`
+- Create: `backend/src/test/java/com/stridehub/checkout/...`
 
 **Capabilities:**
 
@@ -490,12 +495,12 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/payment/domain/...`
-- Create: `src/main/java/com/stridehub/payment/application/...`
-- Create: `src/main/java/com/stridehub/payment/infrastructure/provider/PaymentProvider.java`
-- Create: `src/main/java/com/stridehub/payment/infrastructure/provider/MockPaymentProvider.java`
-- Create: `src/main/java/com/stridehub/payment/web/PaymentWebhookController.java`
-- Create: `src/test/java/com/stridehub/payment/...`
+- Create: `backend/src/main/java/com/stridehub/payment/domain/...`
+- Create: `backend/src/main/java/com/stridehub/payment/application/...`
+- Create: `backend/src/main/java/com/stridehub/payment/infrastructure/provider/PaymentProvider.java`
+- Create: `backend/src/main/java/com/stridehub/payment/infrastructure/provider/MockPaymentProvider.java`
+- Create: `backend/src/main/java/com/stridehub/payment/web/PaymentWebhookController.java`
+- Create: `backend/src/test/java/com/stridehub/payment/...`
 
 **Capabilities:**
 
@@ -527,11 +532,11 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/order/domain/...`
-- Create: `src/main/java/com/stridehub/order/application/...`
-- Create: `src/main/java/com/stridehub/order/infrastructure/...`
-- Create: `src/main/java/com/stridehub/order/web/OrderController.java`
-- Create: `src/test/java/com/stridehub/order/...`
+- Create: `backend/src/main/java/com/stridehub/order/domain/...`
+- Create: `backend/src/main/java/com/stridehub/order/application/...`
+- Create: `backend/src/main/java/com/stridehub/order/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/order/web/OrderController.java`
+- Create: `backend/src/test/java/com/stridehub/order/...`
 
 **Capabilities:**
 
@@ -566,11 +571,11 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/seller/domain/...`
-- Create: `src/main/java/com/stridehub/seller/application/...`
-- Create: `src/main/java/com/stridehub/seller/infrastructure/...`
-- Create: `src/main/java/com/stridehub/seller/web/SellerApplicationController.java`
-- Create: `src/test/java/com/stridehub/seller/...`
+- Create: `backend/src/main/java/com/stridehub/seller/domain/...`
+- Create: `backend/src/main/java/com/stridehub/seller/application/...`
+- Create: `backend/src/main/java/com/stridehub/seller/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/seller/web/SellerApplicationController.java`
+- Create: `backend/src/test/java/com/stridehub/seller/...`
 
 **Capabilities:**
 
@@ -599,9 +604,9 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/admin/web/AdminSellerController.java`
-- Create: `src/main/java/com/stridehub/admin/application/...`
-- Create: `src/test/java/com/stridehub/admin/...`
+- Create: `backend/src/main/java/com/stridehub/admin/web/AdminSellerController.java`
+- Create: `backend/src/main/java/com/stridehub/admin/application/...`
+- Create: `backend/src/test/java/com/stridehub/admin/...`
 
 **Capabilities:**
 
@@ -632,9 +637,9 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/seller/web/SellerProductController.java`
+- Create: `backend/src/main/java/com/stridehub/seller/web/SellerProductController.java`
 - Modify: catalog module application services
-- Create: `src/test/java/com/stridehub/seller/product/...`
+- Create: `backend/src/test/java/com/stridehub/seller/product/...`
 
 **Capabilities:**
 
@@ -665,8 +670,8 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/admin/web/AdminProductController.java`
-- Create: `src/test/java/com/stridehub/admin/product/...`
+- Create: `backend/src/main/java/com/stridehub/admin/web/AdminProductController.java`
+- Create: `backend/src/test/java/com/stridehub/admin/product/...`
 
 **Capabilities:**
 
@@ -696,8 +701,8 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/seller/web/SellerInventoryController.java`
-- Create: `src/test/java/com/stridehub/seller/inventory/...`
+- Create: `backend/src/main/java/com/stridehub/seller/web/SellerInventoryController.java`
+- Create: `backend/src/test/java/com/stridehub/seller/inventory/...`
 
 **Capabilities:**
 
@@ -728,10 +733,10 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/audit/domain/...`
-- Create: `src/main/java/com/stridehub/audit/application/...`
-- Create: `src/main/java/com/stridehub/audit/infrastructure/...`
-- Create: `src/test/java/com/stridehub/audit/...`
+- Create: `backend/src/main/java/com/stridehub/audit/domain/...`
+- Create: `backend/src/main/java/com/stridehub/audit/application/...`
+- Create: `backend/src/main/java/com/stridehub/audit/infrastructure/...`
+- Create: `backend/src/test/java/com/stridehub/audit/...`
 
 **Capabilities:**
 
@@ -757,8 +762,8 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/common/events/...`
-- Create: `src/test/java/com/stridehub/events/...`
+- Create: `backend/src/main/java/com/stridehub/common/events/...`
+- Create: `backend/src/test/java/com/stridehub/events/...`
 
 **Capabilities:**
 
@@ -786,11 +791,11 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/refund/domain/...`
-- Create: `src/main/java/com/stridehub/refund/application/...`
-- Create: `src/main/java/com/stridehub/refund/infrastructure/...`
-- Create: `src/main/java/com/stridehub/refund/web/RefundController.java`
-- Create: `src/test/java/com/stridehub/refund/...`
+- Create: `backend/src/main/java/com/stridehub/refund/domain/...`
+- Create: `backend/src/main/java/com/stridehub/refund/application/...`
+- Create: `backend/src/main/java/com/stridehub/refund/infrastructure/...`
+- Create: `backend/src/main/java/com/stridehub/refund/web/RefundController.java`
+- Create: `backend/src/test/java/com/stridehub/refund/...`
 
 **Capabilities:**
 
@@ -820,9 +825,9 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/payment/application/ReconciliationService.java`
-- Create: `src/main/java/com/stridehub/payment/application/ReconciliationJob.java`
-- Create: `src/test/java/com/stridehub/payment/reconciliation/...`
+- Create: `backend/src/main/java/com/stridehub/payment/application/ReconciliationService.java`
+- Create: `backend/src/main/java/com/stridehub/payment/application/ReconciliationJob.java`
+- Create: `backend/src/test/java/com/stridehub/payment/reconciliation/...`
 
 **Capabilities:**
 
@@ -850,9 +855,9 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/admin/web/AdminAuditController.java`
-- Create: `src/main/java/com/stridehub/admin/web/AdminOrderOpsController.java`
-- Create: `src/test/java/com/stridehub/admin/ops/...`
+- Create: `backend/src/main/java/com/stridehub/admin/web/AdminAuditController.java`
+- Create: `backend/src/main/java/com/stridehub/admin/web/AdminOrderOpsController.java`
+- Create: `backend/src/test/java/com/stridehub/admin/ops/...`
 
 **Capabilities:**
 
@@ -882,8 +887,8 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/notification/...`
-- Create: `src/test/java/com/stridehub/notification/...`
+- Create: `backend/src/main/java/com/stridehub/notification/...`
+- Create: `backend/src/test/java/com/stridehub/notification/...`
 
 **Capabilities:**
 
@@ -912,8 +917,8 @@ No controller should depend directly on entity internals. No module should reach
 **Files:**
 
 - Modify: configuration files
-- Create: `src/main/java/com/stridehub/config/ObservabilityConfig.java`
-- Create: `src/test/java/com/stridehub/observability/...`
+- Create: `backend/src/main/java/com/stridehub/config/ObservabilityConfig.java`
+- Create: `backend/src/test/java/com/stridehub/observability/...`
 
 **Required Metrics:**
 
@@ -944,8 +949,8 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/security/ratelimit/...`
-- Create: `src/test/java/com/stridehub/security/ratelimit/...`
+- Create: `backend/src/main/java/com/stridehub/security/ratelimit/...`
+- Create: `backend/src/test/java/com/stridehub/security/ratelimit/...`
 
 **Endpoints to Protect:**
 
@@ -974,8 +979,8 @@ No controller should depend directly on entity internals. No module should reach
 
 **Files:**
 
-- Create: `src/main/java/com/stridehub/config/SeedDataConfig.java`
-- Create: `src/main/resources/db/migration/V4__seed_reference_data.sql`
+- Create: `backend/src/main/java/com/stridehub/config/SeedDataConfig.java`
+- Create: `backend/src/main/resources/db/migration/V4__seed_reference_data.sql`
 
 **Seed Scope:**
 
@@ -1103,9 +1108,9 @@ Before calling the product build-ready, run:
 
 ```powershell
 git status --short --branch
-.\mvnw.cmd test
-.\mvnw.cmd -q -DskipTests compile
-.\mvnw.cmd spring-boot:run
+.\backend\mvnw.cmd test
+.\backend\mvnw.cmd -q -DskipTests compile
+.\backend\mvnw.cmd spring-boot:run
 ```
 
 Then verify manually:
@@ -1159,3 +1164,4 @@ The following remain outside this full production plan and should only be added 
 - dedicated search service extraction
 - warehouse routing engine
 - international pricing and tax complexity
+
