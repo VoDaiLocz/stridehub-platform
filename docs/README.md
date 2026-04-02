@@ -6,6 +6,7 @@ StrideHub is a production-style, backend-heavy `multi-vendor footwear marketplac
 
 - [Product Requirements Document](./prd.md)
 - [Enterprise Delivery Plan](./plans/2026-04-02-stridehub-enterprise-plan.md)
+- [Detailed Phase 1 Execution Plan](./plans/2026-04-02-stridehub-phase-1-execution-plan.md)
 - [Architecture](./architecture.md)
 - [Domain Model](./domain-model.md)
 - [OpenAPI Specification](./api/openapi.yaml)
@@ -18,12 +19,13 @@ StrideHub is a production-style, backend-heavy `multi-vendor footwear marketplac
 
 1. `prd.md`
 2. `plans/2026-04-02-stridehub-enterprise-plan.md`
-3. `architecture.md`
-4. `domain-model.md`
-5. `api/openapi.yaml`
-6. `test-strategy.md`
-7. `runbooks/*`
-8. `adr/*`
+3. `plans/2026-04-02-stridehub-phase-1-execution-plan.md`
+4. `architecture.md`
+5. `domain-model.md`
+6. `api/openapi.yaml`
+7. `test-strategy.md`
+8. `runbooks/*`
+9. `adr/*`
 
 ## Scope of This Documentation Set
 
