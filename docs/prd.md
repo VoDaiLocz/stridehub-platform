@@ -1,105 +1,162 @@
 # StrideHub Product Requirements Document
 
-## 1. Product Overview
+## 1. Executive Summary
 
-StrideHub la nen tang marketplace nhieu nguoi ban, tap trung vao footwear va cac bien the san pham nhu `size`, `color`, `sku`, `inventory`. Buyer-facing experience duoc thiet ke theo huong retail premium, nhung phan cot loi cua san pham la backend van hanh don hang, thanh toan, ton kho, seller governance va auditability.
+StrideHub is a multi-vendor marketplace focused on footwear. It is intentionally designed to look like a real product platform rather than a demo storefront. The product emphasizes backend complexity where commerce systems typically fail in practice: product variants, stock accuracy, checkout integrity, payment confirmation, order lifecycle management, seller governance, and operational traceability.
 
-San pham khong dat muc tieu tro thanh san thuong mai dien tu tong quat o giai doan dau. Muc tieu la tao mot he thong co flow thuc te va co do sau ky thuat de mo rong thanh production-style platform.
+The buyer experience should feel premium and modern, inspired by high-quality direct-to-consumer retail sites such as `Vessi`. The internal engineering goal, however, is not primarily to clone a storefront. The goal is to build a system that demonstrates production-grade backend thinking and architecture.
 
-## 2. Business Goals
+## 2. Problem Statement
 
-- Xay dung MVP co kha nang xu ly don va thanh toan cho marketplace footwear.
-- Dam bao khong oversell o case canh tranh co ban.
-- Ho tro onboarding seller va moderation de quan ly chat luong catalog.
-- Tao nen tang cho refund, reconciliation va support operation o phase tiep theo.
+Most portfolio e-commerce applications stop at simple CRUD over products and orders. That shape is insufficient for demonstrating real marketplace engineering capability because it ignores the difficult parts:
 
-## 3. Success Metrics
+- a single product has multiple sellable variants
+- inventory is managed per variant, not per product
+- concurrent checkout flows can oversell
+- payment redirects are not a reliable source of truth
+- seller onboarding and moderation create governance requirements
+- refund handling and operational overrides require auditability
 
-### Product Metrics
+StrideHub exists to solve those gaps in a buildable, modular, enterprise-style backend project.
 
-- Checkout completion rate
-- Order confirmation success rate
-- Catalog conversion by product detail view
-- Seller approval turnaround time
-- Refund turnaround time
+## 3. Product Vision
 
-### Engineering Metrics
+Create a footwear marketplace platform where:
 
-- Zero duplicate order confirmation tu webhook retry
-- Zero inventory commit duplicate tren cung mot reservation
-- p95 catalog read < 300ms
-- p95 checkout validation < 500ms
+- buyers can browse, purchase, and track orders safely
+- sellers can onboard, publish inventory, and fulfill orders
+- admins can moderate catalog quality and intervene operationally
+- finance and support operations can rely on payment and order traceability
 
-## 4. Primary Personas
+## 4. Product Goals
+
+### Primary Goals
+
+- Deliver a realistic commerce backend with a modular architecture.
+- Prevent duplicate order confirmation and basic oversell scenarios.
+- Support marketplace governance through seller approval and product moderation.
+- Establish a strong foundation for refunds, reconciliation, and operations tooling.
+
+### Secondary Goals
+
+- Keep the initial build feasible within a single codebase.
+- Produce documentation that reflects a professional software engineering process.
+- Leave clear extension points for future phases without over-engineering v1.
+
+## 5. Non-Goals
+
+The following are explicitly out of scope for the first implementation phase:
+
+- seller payouts
+- advanced fraud detection
+- AI recommendations
+- dynamic pricing engine
+- multi-warehouse fulfillment
+- dedicated search service
+- omnichannel or POS integrations
+
+## 6. Target Users
 
 ### Buyer
 
-- Duyet san pham theo category va brand
-- Xem variant theo size/color
-- Them vao cart
-- Checkout va thanh toan
-- Theo doi order, cancel, request return
+- browses the storefront
+- selects size and color variants
+- manages a cart
+- completes payment
+- tracks orders
+- initiates cancellation or return requests
 
 ### Seller
 
-- Nop ho so dang ky
-- Quan ly product, SKU, inventory
-- Xac nhan fulfill don
-- Xu ly refund/request theo policy
+- applies to become a marketplace seller
+- manages products, variants, pricing, and inventory
+- reviews and fulfills assigned orders
 
-### Admin / Ops
+### Admin / Operations
 
-- Duyet seller application
-- Duyet/tu choi product
-- Can thiep order bat thuong
-- Tim kiem audit va theo doi van hanh
+- reviews seller applications
+- moderates products and catalog quality
+- investigates failed or stuck orders
+- performs controlled operational overrides
 
-## 5. In Scope V1
-
-- Auth voi JWT access token va refresh token
-- Catalog: category, brand, product, variant, product image
-- Inventory theo SKU
-- Cart va checkout
-- External payment gateway pattern
-- Payment webhook + idempotent processing
-- Order lifecycle co state machine
-- Seller application va approval
-- Admin moderation co audit log
-
-## 6. Out of Scope V1
-
-- Seller payout orchestration
-- Recommendation engine
-- Dynamic pricing engine
-- Fraud scoring
-- Multi-warehouse inventory routing
-- Search engine rieng
-
-## 7. Key User Journeys
+## 7. Core User Journeys
 
 ### Buyer Purchase Journey
 
-1. Dang ky hoac dang nhap
-2. Duyet product listing
-3. Chon variant `size/color`
-4. Them vao cart
-5. Tao checkout session
-6. Thanh toan qua gateway
-7. Nhan xac nhan don
+1. Sign up or sign in.
+2. Browse products by category, brand, and filters.
+3. Select a product variant by size and color.
+4. Add it to cart.
+5. Start checkout.
+6. Inventory is reserved and payment is initiated.
+7. Payment webhook confirms the final payment outcome.
+8. Order is confirmed and inventory reservation is committed.
 
 ### Seller Onboarding Journey
 
-1. Dang ky account
-2. Gui seller application
-3. Admin review
-4. Approval
-5. Tao product va SKU
-6. Product duoc moderation
-7. Product active va bat dau nhan order
+1. Register as a standard user.
+2. Submit a seller application.
+3. Admin reviews the application.
+4. Upon approval, seller gains seller capabilities.
+5. Seller creates products and variants.
+6. Admin moderates or approves listed inventory for publication.
 
-## 8. Risks and Constraints
+### Operations Recovery Journey
 
-- Webhook tu payment provider co the gui lap lai hoac den tre.
-- Inventory reservation neu sai se gay oversell.
-- Product variant la don vi ton kho that, nen schema va flow phai uu tien SKU-first.
-- Hien tai project duoc thiet ke de build trong mot codebase, nen can giu boundary ro rang de tranh "big ball of mud".
+1. A payment webhook arrives late, duplicated, or out of order.
+2. The payment module verifies signature and idempotency.
+3. The system replays or ignores safely without creating duplicate orders.
+4. The audit trail records the event and the resulting state transition.
+
+## 8. Functional Scope for V1
+
+- registration, login, refresh token rotation, role-based access control
+- category, brand, product, variant, and image management
+- inventory tracking per sellable SKU
+- cart and cart item management
+- checkout session creation
+- payment gateway initiation and webhook callback handling
+- order creation, confirmation, and lifecycle tracking
+- seller application workflow
+- admin approval and moderation actions
+- audit logging for privileged and financial actions
+
+## 9. Key Product Constraints
+
+- Product variant is the sellable unit.
+- Inventory is tracked per SKU.
+- Checkout must revalidate catalog and pricing.
+- Payment webhook is the final payment source of truth.
+- Admin interventions must always be attributable to an actor and reason.
+
+## 10. Success Metrics
+
+### Product Metrics
+
+- checkout conversion rate
+- payment success rate
+- order confirmation rate
+- seller approval turnaround time
+- refund resolution turnaround time
+
+### Engineering Metrics
+
+- zero duplicate order confirmation from repeated payment callbacks
+- zero duplicate inventory commit for the same reservation
+- p95 catalog read latency below 300ms
+- p95 checkout validation latency below 500ms
+- payment webhook processing p95 below 2 seconds
+
+## 11. Risks
+
+- incorrect reservation handling may cause oversell
+- weak webhook handling may create duplicate confirmations
+- blurred module boundaries may cause a hard-to-maintain monolith
+- insufficient auditability may block support and finance operations
+
+## 12. Assumptions
+
+- the first delivery targets a single-region deployment
+- payment is handled through an external gateway
+- internal UI surfaces for seller and admin can remain operationally focused
+- the product is optimized for engineering realism rather than broad consumer feature breadth

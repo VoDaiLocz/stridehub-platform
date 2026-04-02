@@ -1,20 +1,20 @@
-# StrideHub Documentation Index
+# StrideHub Documentation
 
-StrideHub la multi-vendor footwear marketplace duoc thiet ke theo huong backend-heavy, modular monolith, buyer-facing UI lay cam hung tu Vessi.
+StrideHub is a production-style, backend-heavy `multi-vendor footwear marketplace` designed as a modular monolith. This documentation set is written to resemble a real engineering documentation package used for product delivery, architecture review, implementation planning, and operations handoff.
 
-## Doc Set
+## Documentation Map
 
-- [Product Requirements](./prd.md)
-- [Enterprise Plan](./plans/2026-04-02-stridehub-enterprise-plan.md)
+- [Product Requirements Document](./prd.md)
+- [Enterprise Delivery Plan](./plans/2026-04-02-stridehub-enterprise-plan.md)
 - [Architecture](./architecture.md)
 - [Domain Model](./domain-model.md)
-- [API Specification](./api/openapi.yaml)
+- [OpenAPI Specification](./api/openapi.yaml)
 - [Test Strategy](./test-strategy.md)
-- [Runbooks](./runbooks/README.md)
 - [Release Checklist](./release-checklist.md)
+- [Runbook Index](./runbooks/README.md)
 - [ADR Index](./adr/README.md)
 
-## Reading Order
+## Recommended Reading Order
 
 1. `prd.md`
 2. `plans/2026-04-02-stridehub-enterprise-plan.md`
@@ -23,10 +23,58 @@ StrideHub la multi-vendor footwear marketplace duoc thiet ke theo huong backend-
 5. `api/openapi.yaml`
 6. `test-strategy.md`
 7. `runbooks/*`
+8. `adr/*`
 
-## Delivery Phases
+## Scope of This Documentation Set
 
-- Phase 1: Identity, catalog, variant inventory, cart, checkout, payment webhook, order confirmation, admin bootstrap.
-- Phase 2: Seller onboarding, moderation, seller inventory console, seller fulfillment, reviews.
-- Phase 3: Refunds, reconciliation, support operations, dashboards, alerts, audit search.
-- Phase 4: Search, recommendations, payouts, fraud/risk, multi-warehouse.
+This repository currently focuses on the documentation package for the initial product foundation:
+
+- Product framing and success criteria
+- System design and architectural rationale
+- Domain model and workflow definitions
+- API contract baseline
+- Operational guidance for core failure scenarios
+- Test and release discipline
+
+## Delivery Scope by Phase
+
+### Phase 1
+
+- Identity and access
+- Catalog and product variants
+- Inventory and reservation model
+- Cart and checkout
+- External payment gateway integration pattern
+- Payment webhook processing
+- Order confirmation
+- Admin bootstrap capabilities
+
+### Phase 2
+
+- Seller onboarding and approval
+- Product moderation workflow
+- Seller inventory management
+- Seller fulfillment workflow
+- Review and rating foundations
+
+### Phase 3
+
+- Refund orchestration
+- Payment reconciliation
+- Support tooling and operational dashboards
+- Audit search and interventions
+
+### Phase 4
+
+- Search service
+- Recommendation engine
+- Seller payouts
+- Fraud and risk scoring
+- Multi-warehouse support
+
+## Documentation Standards
+
+- English is used for all engineering-facing documentation.
+- Mermaid diagrams are used so architecture and workflows remain version-controlled and diff-friendly.
+- ADRs capture decisions that materially affect implementation or operations.
+- API documentation follows an OpenAPI-first approach.

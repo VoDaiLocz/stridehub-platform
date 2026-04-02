@@ -1,88 +1,128 @@
-# StrideHub Enterprise Implementation Plan
+# StrideHub Enterprise Delivery Plan
 
-> Design baseline for a modular-monolith, production-style marketplace backend.
+## 1. Delivery Objective
 
-## Summary
+Deliver a buildable, production-style foundation for a multi-vendor footwear marketplace using a modular monolith architecture. The implementation should prioritize correctness, observability, extensibility, and realistic commerce workflows over surface-level feature count.
 
-- Domain: `multi-vendor footwear marketplace`
-- Architecture: `modular monolith`
-- Runtime stack: `Java 21`, `Spring Boot`, `PostgreSQL`, `Redis`, `Flyway`
-- Integration style: `REST + domain events + outbox`
-- Buyer UI inspiration: `Vessi`
-- Payment strategy: external gateway pattern (`Stripe/Momo/VNPay` style)
+## 2. Delivery Workstreams
 
-## Core Modules
+### Workstream A: Platform Foundation
 
-- Identity & Access
-- Seller Management
-- Catalog
-- Inventory
-- Cart
-- Checkout
-- Payment
-- Order Management
-- Returns & Refunds
-- Reviews & Ratings
-- Notifications
-- Admin & Moderation
-- Reporting & Audit
+- project skeleton and dependency baseline
+- configuration model for local, staging, and production
+- database migration strategy
+- base security configuration
+- logging, tracing, and metrics baseline
 
-## Architectural Principles
+### Workstream B: Commerce Core
 
-- Single transaction chi ton tai trong mot bounded context.
-- Payment webhook chi di qua payment boundary va publish event thay vi mutate nhieu module truc tiep.
-- Moi hanh dong quan trong phai co `idempotency key`, `correlation id`, `audit log`.
-- Product variant la source of truth cho pricing va inventory.
-- Cart phai duoc revalidate tai checkout.
+- catalog and variant model
+- inventory model and reservation rules
+- cart and checkout session flow
+- payment request and webhook processing
+- order confirmation and lifecycle
 
-## Phase Plan
+### Workstream C: Marketplace Governance
 
-### Phase 1
+- seller application and approval
+- product review and moderation
+- admin operations and audit logging
 
-- Auth
-- Catalog
-- Variant inventory
-- Cart
-- Checkout
-- Payment webhook
-- Order confirmation
-- Admin bootstrap
+### Workstream D: Operations Readiness
 
-### Phase 2
+- runbooks for expected failures
+- test strategy and release discipline
+- reconciliation hooks
+- metrics and dashboards outline
 
-- Seller onboarding
-- Product moderation
-- Seller inventory console
-- Seller fulfillment
-- Reviews
+## 3. Phase Breakdown
 
-### Phase 3
+### Phase 1: Foundation and Core Commerce
 
-- Refunds
-- Reconciliation
-- Support tooling
-- Dashboards
-- Alerts
-- Audit search
+Deliverables:
 
-### Phase 4
+- authentication and RBAC
+- category, brand, product, variant, and image model
+- inventory items and reservation lifecycle
+- cart and checkout session
+- payment initiation and webhook callback handling
+- order creation and confirmation
+- admin bootstrap tools
 
-- Search service
-- Recommendations
-- Payout orchestration
-- Fraud/risk scoring
-- Multi-warehouse support
+Exit criteria:
 
-## Key Contracts
+- a buyer can complete a basic purchase flow
+- payment webhook retries do not duplicate order confirmation
+- reservation expiry and release paths are defined
 
-- `Payment webhook` la source xac nhan thanh toan cuoi cung.
-- `InventoryReservation` phai duoc `ACTIVE -> COMMITTED|RELEASED|EXPIRED`.
-- `Order placement` va `refund processing` phai idempotent.
-- `Admin action` luon co actor, timestamp, reason.
+### Phase 2: Marketplace Capabilities
 
-## Acceptance Baseline
+Deliverables:
 
-- Khong duplicate order khi webhook retry
-- Khong oversell o case canh tranh co ban
-- Co trace va audit cho order/payment/refund
-- Role boundary ro giua buyer/seller/admin
+- seller application and review flow
+- seller product management
+- moderation state transitions
+- seller fulfillment entry points
+- review and rating foundations
+
+Exit criteria:
+
+- a seller can onboard, publish moderated inventory, and receive orders
+- admin can govern seller and catalog access safely
+
+### Phase 3: Operations and Financial Integrity
+
+Deliverables:
+
+- refund processing
+- reconciliation jobs and reporting hooks
+- operational dashboards and audit search
+- support intervention flows
+
+Exit criteria:
+
+- operations can investigate payment, order, and refund mismatches
+- core finance-sensitive workflows are traceable
+
+### Phase 4: Scale and Platform Expansion
+
+Deliverables:
+
+- dedicated search service
+- recommendation engine
+- payout orchestration
+- fraud/risk scoring
+- multi-warehouse support
+
+## 4. Delivery Risks and Dependencies
+
+### Risks
+
+- webhook processing semantics may be implemented incorrectly
+- variant and SKU complexity may leak into multiple modules
+- refund design may become inconsistent if introduced without a payment abstraction
+- operational documentation may lag behind code changes if not updated as part of the development workflow
+
+### Dependencies
+
+- PostgreSQL for transactional source of truth
+- Redis for ephemeral and performance-critical workloads
+- external payment gateway sandbox
+- object storage for product images and uploads
+
+## 5. Engineering Standards
+
+- all critical domain transitions require explicit tests
+- all privileged actions require auditability
+- public API contracts should remain OpenAPI-documented
+- new architectural decisions require ADRs when they change system behavior materially
+- commit history should remain task-oriented and reviewable
+
+## 6. Completion Definition
+
+The platform is considered delivery-ready for the current stage when:
+
+- core documentation is complete and consistent
+- phase-appropriate implementation artifacts exist
+- the API contract covers the first production slice
+- operational and test guidance is present for the delivered scope
