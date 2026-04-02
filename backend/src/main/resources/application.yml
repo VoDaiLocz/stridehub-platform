@@ -56,3 +56,6 @@ stridehub:
     webhook-signature-header: X-Signature
   audit:
     correlation-id-header: X-Correlation-Id
+  web:
+    allowed-origins:
+      - http://localhost:5173

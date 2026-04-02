@@ -28,6 +28,14 @@ class SecurityConfigTest {
     }
 
     @Test
+    void shouldAllowConfiguredFrontendOriginForHealthEndpoint() throws Exception {
+        mockMvc.perform(get("/actuator/health")
+                        .header("Origin", "http://localhost:5173"))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
+    }
+
+    @Test
     void shouldExposeOpenApiWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk());
