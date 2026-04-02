@@ -6,7 +6,10 @@ info:
     Baseline OpenAPI contract for the first production slice of the StrideHub
     marketplace backend. This specification focuses on the highest-value public
     workflows: authentication, catalog discovery, cart, checkout, orders,
-    seller onboarding, and admin approval.
+    seller onboarding, and admin approval. This file is the design-time target
+    contract for the first business slice; the runtime `/v3/api-docs` endpoint
+    currently exposes only the Program 0 foundation endpoints already
+    implemented in code.
 servers:
   - url: http://localhost:8080
     description: Local development

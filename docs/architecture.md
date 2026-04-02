@@ -282,3 +282,9 @@ flowchart LR
 - Local: application + PostgreSQL + Redis + mock email/object storage
 - Staging: sandbox gateway and seeded catalog
 - Production: rolling or blue-green deployment with managed secrets and backups
+
+Current baseline note:
+
+- The repository already provisions PostgreSQL, Redis, Mailpit, and MinIO through `docker-compose.yml`.
+- The application baseline currently integrates directly with PostgreSQL and Redis.
+- Email delivery and object storage integrations are provisioned for local development but remain future module work.

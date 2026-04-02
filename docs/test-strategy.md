@@ -66,6 +66,12 @@ Focus:
 - full API and integration suite
 - deterministic seed data
 
+Current baseline:
+
+- The current GitHub Actions workflow verifies compile and test against the `test` profile.
+- The `test` profile uses H2 in PostgreSQL compatibility mode to keep Program 0 verification deterministic and independent of Docker.
+- PostgreSQL and Redis container-backed tests remain planned for later database-sensitive modules.
+
 ### Pre-Release / Staging
 
 - sandbox payment provider

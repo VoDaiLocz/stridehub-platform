@@ -13,25 +13,40 @@ StrideHub is a production-style, backend-heavy `multi-vendor footwear marketplac
 - [OpenAPI Specification](./api/openapi.yaml)
 - [Test Strategy](./test-strategy.md)
 - [Release Checklist](./release-checklist.md)
+- [Baseline Consistency Audit](./audits/2026-04-02-baseline-consistency-audit.md)
 - [Runbook Index](./runbooks/README.md)
 - [ADR Index](./adr/README.md)
 
 ## Recommended Reading Order
 
 1. `prd.md`
-2. `plans/2026-04-02-stridehub-enterprise-plan.md`
-3. `plans/2026-04-02-stridehub-full-production-execution-plan.md`
-4. `plans/2026-04-02-stridehub-phase-1-execution-plan.md`
-5. `architecture.md`
-6. `domain-model.md`
-7. `api/openapi.yaml`
-8. `test-strategy.md`
-9. `runbooks/*`
-10. `adr/*`
+2. `audits/2026-04-02-baseline-consistency-audit.md`
+3. `plans/2026-04-02-stridehub-enterprise-plan.md`
+4. `plans/2026-04-02-stridehub-full-production-execution-plan.md`
+5. `plans/2026-04-02-stridehub-phase-1-execution-plan.md`
+6. `architecture.md`
+7. `domain-model.md`
+8. `api/openapi.yaml`
+9. `test-strategy.md`
+10. `runbooks/*`
+11. `adr/*`
 
 ## Scope of This Documentation Set
 
-This repository currently focuses on the documentation package for the initial product foundation:
+This repository currently combines two documentation modes:
+
+- `implemented baseline` documentation for the foundation already present in the codebase
+- `target-state planning` documentation for the product roadmap that will be implemented in later phases
+
+### Implemented Baseline
+
+- Program 0 engineering foundation
+- runtime configuration and environment setup
+- baseline schema migrations
+- security and request-correlation foundation
+- CI build verification
+
+### Target-State Planning
 
 - Product framing and success criteria
 - System design and architectural rationale
@@ -82,3 +97,4 @@ This repository currently focuses on the documentation package for the initial p
 - Mermaid diagrams are used so architecture and workflows remain version-controlled and diff-friendly.
 - ADRs capture decisions that materially affect implementation or operations.
 - API documentation follows an OpenAPI-first approach.
+- Files under `plans/` describe intended delivery order; they are not claims that every item is already implemented.
