@@ -1,0 +1,541 @@
+openapi: 3.1.0
+info:
+  title: StrideHub API
+  version: 0.1.0
+  description: >
+    Baseline OpenAPI contract for the first production slice of the StrideHub
+    marketplace backend. This specification focuses on the highest-value public
+    workflows: authentication, catalog discovery, cart, checkout, orders,
+    seller onboarding, and admin approval.
+servers:
+  - url: http://localhost:8080
+    description: Local development
+tags:
+  - name: Auth
+  - name: Catalog
+  - name: Cart
+  - name: Checkout
+  - name: Orders
+  - name: Seller
+  - name: Admin
+  - name: Payment Webhooks
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register a buyer account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthEnvelope'
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Authenticate a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthEnvelope'
+  /catalog/products:
+    get:
+      tags: [Catalog]
+      summary: Search products
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: brand
+          schema:
+            type: string
+        - in: query
+          name: size
+          schema:
+            type: string
+        - in: query
+          name: color
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
+        - in: query
+          name: sizeLimit
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: Paged product search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSearchResponse'
+  /catalog/products/{slug}:
+    get:
+      tags: [Catalog]
+      summary: Get product detail by slug
+      parameters:
+        - in: path
+          name: slug
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Product detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+        '404':
+          description: Product not found
+  /cart:
+    get:
+      tags: [Cart]
+      summary: Get current buyer cart
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cart state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+  /cart/items:
+    post:
+      tags: [Cart]
+      summary: Add or update a cart item
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemUpsertRequest'
+      responses:
+        '200':
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+  /checkout/sessions:
+    post:
+      tags: [Checkout]
+      summary: Create a checkout session
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutSessionRequest'
+      responses:
+        '201':
+          description: Checkout session created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CheckoutSessionResponse'
+  /checkout/payment-intent:
+    post:
+      tags: [Checkout]
+      summary: Create a payment request for an active checkout session
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentIntentRequest'
+      responses:
+        '200':
+          description: Payment initiated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentIntentResponse'
+  /orders/{id}:
+    get:
+      tags: [Orders]
+      summary: Get order detail
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Order detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+  /seller/applications:
+    post:
+      tags: [Seller]
+      summary: Submit a seller application
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SellerApplicationRequest'
+      responses:
+        '201':
+          description: Seller application submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerApplicationResponse'
+  /admin/sellers/{sellerId}/approve:
+    post:
+      tags: [Admin]
+      summary: Approve a seller application
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: sellerId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminDecisionRequest'
+      responses:
+        '200':
+          description: Seller approved
+  /webhooks/payment/provider:
+    post:
+      tags: [Payment Webhooks]
+      summary: Receive signed payment webhook events
+      parameters:
+        - in: header
+          name: X-Signature
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentWebhookEvent'
+      responses:
+        '202':
+          description: Webhook accepted for processing
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AuthEnvelope:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserSummary'
+      required: [accessToken, refreshToken, user]
+    RegisterRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        firstName:
+          type: string
+        lastName:
+          type: string
+      required: [email, password, firstName, lastName]
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required: [email, password]
+    UserSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        roles:
+          type: array
+          items:
+            type: string
+      required: [id, email, roles]
+    ProductSearchResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductSummary'
+        page:
+          type: integer
+        totalPages:
+          type: integer
+      required: [items, page, totalPages]
+    ProductSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        name:
+          type: string
+        brand:
+          type: string
+        minPrice:
+          type: number
+        currency:
+          type: string
+        imageUrl:
+          type: string
+          format: uri
+      required: [id, slug, name, brand, minPrice, currency]
+    ProductDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        brand:
+          type: string
+        category:
+          type: string
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductVariant'
+      required: [id, slug, name, variants]
+    ProductVariant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        size:
+          type: string
+        color:
+          type: string
+        price:
+          type: number
+        availableQuantity:
+          type: integer
+      required: [id, sku, size, color, price, availableQuantity]
+    CartItemUpsertRequest:
+      type: object
+      properties:
+        productVariantId:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+      required: [productVariantId, quantity]
+    CartResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItem'
+        subtotal:
+          type: number
+        currency:
+          type: string
+      required: [id, items, subtotal, currency]
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        productVariantId:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        quantity:
+          type: integer
+        unitPrice:
+          type: number
+      required: [id, productVariantId, sku, quantity, unitPrice]
+    CheckoutSessionRequest:
+      type: object
+      properties:
+        shippingAddressId:
+          type: string
+          format: uuid
+      required: [shippingAddressId]
+    CheckoutSessionResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        reservationExpiresAt:
+          type: string
+          format: date-time
+        amount:
+          type: number
+        currency:
+          type: string
+      required: [id, status, reservationExpiresAt, amount, currency]
+    PaymentIntentRequest:
+      type: object
+      properties:
+        checkoutSessionId:
+          type: string
+          format: uuid
+      required: [checkoutSessionId]
+    PaymentIntentResponse:
+      type: object
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+        providerReference:
+          type: string
+        redirectUrl:
+          type: string
+          format: uri
+      required: [paymentId, providerReference]
+    OrderResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        totalAmount:
+          type: number
+        currency:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+      required: [id, status, totalAmount, currency, items]
+    OrderItem:
+      type: object
+      properties:
+        productVariantId:
+          type: string
+          format: uuid
+        sku:
+          type: string
+        quantity:
+          type: integer
+        unitPrice:
+          type: number
+      required: [productVariantId, sku, quantity, unitPrice]
+    SellerApplicationRequest:
+      type: object
+      properties:
+        storeName:
+          type: string
+        legalEntityName:
+          type: string
+        contactEmail:
+          type: string
+          format: email
+      required: [storeName, legalEntityName, contactEmail]
+    SellerApplicationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+      required: [id, status]
+    AdminDecisionRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+      required: [reason]
+    PaymentWebhookEvent:
+      type: object
+      properties:
+        eventId:
+          type: string
+        providerReference:
+          type: string
+        eventType:
+          type: string
+        amount:
+          type: number
+        currency:
+          type: string
+      required: [eventId, providerReference, eventType]
