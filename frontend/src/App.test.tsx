@@ -4,7 +4,7 @@ import App from './App'
 
 describe('App', () => {
   beforeEach(() => {
-    global.fetch = vi.fn()
+    globalThis.fetch = vi.fn(() => new Promise<Response>(() => {}))
   })
 
   afterEach(() => {
@@ -12,10 +12,6 @@ describe('App', () => {
   })
 
   it('should render the site header with brand name', () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-    } as Response)
-
     render(<App />)
 
     expect(screen.getByText('StrideHub')).toBeInTheDocument()
@@ -23,10 +19,6 @@ describe('App', () => {
   })
 
   it('should render navigation links', () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-    } as Response)
-
     render(<App />)
 
     expect(screen.getByRole('link', { name: /collections/i })).toBeInTheDocument()
@@ -35,10 +27,6 @@ describe('App', () => {
   })
 
   it('should render hero section with main heading', () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-    } as Response)
-
     render(<App />)
 
     expect(
@@ -129,10 +117,6 @@ describe('App', () => {
   })
 
   it('should render all collection cards', () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-    } as Response)
-
     render(<App />)
 
     expect(screen.getByText('Urban Commute')).toBeInTheDocument()
@@ -144,10 +128,6 @@ describe('App', () => {
   })
 
   it('should render experience points', () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-    } as Response)
-
     render(<App />)
 
     expect(
@@ -162,10 +142,6 @@ describe('App', () => {
   })
 
   it('should render stack section with backend and frontend details', () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-    } as Response)
-
     render(<App />)
 
     expect(screen.getByText('backend/')).toBeInTheDocument()
@@ -175,10 +151,6 @@ describe('App', () => {
   })
 
   it('should render metrics grid with three articles', () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-    } as Response)
-
     render(<App />)
 
     expect(screen.getByText('Backend')).toBeInTheDocument()
@@ -190,10 +162,6 @@ describe('App', () => {
   })
 
   it('should have proper section IDs for navigation', () => {
-    vi.mocked(fetch).mockResolvedValue({
-      ok: true,
-    } as Response)
-
     const { container } = render(<App />)
 
     expect(container.querySelector('#collections')).toBeInTheDocument()
