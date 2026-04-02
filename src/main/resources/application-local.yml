@@ -1,0 +1,29 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: ${STRIDEHUB_DB_URL:jdbc:postgresql://localhost:${STRIDEHUB_DB_PORT:5432}/${STRIDEHUB_DB_NAME:stridehub}}
+    username: ${STRIDEHUB_DB_USERNAME:stridehub}
+    password: ${STRIDEHUB_DB_PASSWORD:stridehub}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+  data:
+    redis:
+      host: ${STRIDEHUB_REDIS_HOST:localhost}
+      port: ${STRIDEHUB_REDIS_PORT:6379}
+      timeout: 2s
+  mail:
+    host: ${STRIDEHUB_MAIL_HOST:localhost}
+    port: ${STRIDEHUB_MAIL_PORT:1025}
+    username: ${STRIDEHUB_MAIL_USERNAME:}
+    password: ${STRIDEHUB_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false

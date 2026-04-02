@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: stridehub-postgres
+    environment:
+      POSTGRES_DB: ${STRIDEHUB_DB_NAME:-stridehub}
+      POSTGRES_USER: ${STRIDEHUB_DB_USERNAME:-stridehub}
+      POSTGRES_PASSWORD: ${STRIDEHUB_DB_PASSWORD:-stridehub}
+    ports:
+      - "${STRIDEHUB_DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${STRIDEHUB_DB_USERNAME:-stridehub} -d ${STRIDEHUB_DB_NAME:-stridehub}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:8-alpine
+    container_name: stridehub-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${STRIDEHUB_REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - redis-data:/data
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    container_name: stridehub-mailpit
+    ports:
+      - "${STRIDEHUB_MAIL_PORT:-1025}:1025"
+      - "8025:8025"
+
+  minio:
+    image: minio/minio:latest
+    container_name: stridehub-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-stridehub}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-stridehub123}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:

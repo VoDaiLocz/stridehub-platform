@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: stridehub
+  profiles:
+    default: local
+  jackson:
+    default-property-inclusion: non_null
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: when_authorized
+  health:
+    redis:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+
+info:
+  application:
+    name: ${spring.application.name}
+    description: Production-style modular monolith foundation for StrideHub
+
+stridehub:
+  jwt:
+    issuer: stridehub
+    secret: ${STRIDEHUB_JWT_SECRET:changeit-changeit-changeit-changeit}
+    access-token-ttl: PT15M
+    refresh-token-ttl: P14D
+  inventory:
+    reservation-ttl: PT10M
+  payment:
+    provider: mock-gateway
+    webhook-signature-header: X-Signature
+  audit:
+    correlation-id-header: X-Correlation-Id
