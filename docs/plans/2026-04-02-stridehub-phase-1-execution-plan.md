@@ -101,6 +101,21 @@ The current repository state already contains the baseline delivered through the
 
 If you need to rebuild Program 0 from scratch, use the full production plan as the canonical reference for the completed baseline history and resulting repository shape.
 
+## Frontend Companion Delivery Rule
+
+Phase 1 is no longer treated as "backend first, frontend later." The execution rule for this repository is:
+
+- backend remains the source of truth for contracts, security, and business rules
+- frontend work starts as soon as the corresponding backend milestone is stable enough to integrate
+- each backend task below includes a frontend companion scope that should be implemented in the same delivery wave whenever practical
+- frontend should not invent contracts ahead of backend, but it also should not wait for all backend tasks to finish before starting buyer-facing work
+
+Use the pattern:
+
+1. implement and verify the backend task
+2. wire the matching frontend screen or state flow
+3. run an integration checkpoint before moving to the next major task
+
 ## Task 1.1: Implement Identity Domain and Security Model
 
 **Objective:** Deliver authentication and authorization foundations required by every later module.
@@ -140,6 +155,13 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 - integration tests for register/login/refresh
 - authorization tests for protected endpoints
 
+**Frontend Companion Work:**
+
+- build `frontend/src` auth screens for register and login
+- add buyer header auth state for signed-in vs signed-out modes
+- add frontend API client wiring for `/auth/register`, `/auth/login`, `/auth/refresh`, and `/me`
+- add route guard placeholder for authenticated pages
+
 **Commit Message:**
 
 `task 1.1: implement authentication and rbac foundation`
@@ -176,6 +198,13 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 
 - API tests for listing and detail
 - tests confirming non-active products are not exposed
+
+**Frontend Companion Work:**
+
+- implement buyer home page sections that depend on category, brand, and featured product APIs
+- implement product listing page with filter and sort controls
+- implement product detail page with variant picker, gallery, and price display
+- keep mocked fallback data only where the backend endpoint is still intentionally deferred
 
 **Commit Message:**
 
@@ -214,6 +243,12 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 - unit tests for reservation rules
 - concurrency integration test for low-stock reservation race
 
+**Frontend Companion Work:**
+
+- wire stock and availability badges on product detail and listing cards
+- disable impossible variant selections when availability data says the option is unavailable
+- show inventory-aware CTA states such as `In stock`, `Low stock`, and `Out of stock`
+
 **Commit Message:**
 
 `task 1.3: implement sku inventory and reservation lifecycle`
@@ -251,6 +286,12 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 - controller tests for add/update/remove
 - integration test for cart ownership isolation
 
+**Frontend Companion Work:**
+
+- implement cart drawer or cart page tied to authenticated buyer state
+- add add-to-cart, update quantity, and remove-item flows from product detail and cart UI
+- show cart subtotal and validation messages from backend responses
+
 **Commit Message:**
 
 `task 1.4: add buyer cart management`
@@ -286,6 +327,12 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 
 - test that checkout fails when a variant is inactive or out of stock
 - test that checkout creates inventory reservations
+
+**Frontend Companion Work:**
+
+- implement checkout page with address form shell, cart summary, and checkout session creation
+- surface backend revalidation errors clearly when price, stock, or product status changes
+- display checkout expiry or reservation timeout information in the UI
 
 **Commit Message:**
 
@@ -325,6 +372,12 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 - unit tests for provider abstraction behavior
 - integration test for duplicate webhook replay
 
+**Frontend Companion Work:**
+
+- integrate payment initiation from the checkout page
+- add pending, failed, and success payment states in the buyer flow
+- prepare frontend polling or redirect-handling behavior if the mock provider flow needs it locally
+
 **Commit Message:**
 
 `task 1.6: add payment initiation and webhook processing`
@@ -361,6 +414,12 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 
 - integration test from payment success to order creation
 - test that repeated webhook does not create a duplicate order
+
+**Frontend Companion Work:**
+
+- implement buyer order confirmation screen after successful payment
+- implement order detail and order history views under the buyer account area
+- show stable order snapshot data instead of reusing mutable catalog state
 
 **Commit Message:**
 
@@ -399,6 +458,12 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 - tests for buyer cannot call admin endpoints
 - tests for approval changing seller state
 
+**Frontend Companion Work:**
+
+- add seller application page in the buyer account area
+- add status display for pending, approved, and rejected seller application states
+- keep admin approval UI out of scope for buyer web; reserve that for a later internal-facing frontend surface if needed
+
 **Commit Message:**
 
 `task 1.8: implement seller application and approval workflow`
@@ -435,6 +500,11 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 
 - integration tests showing audit rows are written for admin approval and order confirmation
 
+**Frontend Companion Work:**
+
+- no major new buyer page is required
+- if useful, expose non-sensitive status breadcrumbs in the buyer UI such as payment processing or order confirmation states without leaking audit internals
+
 **Commit Message:**
 
 `task 1.9: add audit logging and outbox persistence foundation`
@@ -460,6 +530,12 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 
 - validate YAML syntax
 - run API tests against implemented controllers
+
+**Frontend Companion Work:**
+
+- remove temporary frontend mocks for any endpoint now implemented for real
+- align frontend request and response types with the OpenAPI contract
+- verify frontend error rendering matches the shared error envelope
 
 **Commit Message:**
 
@@ -489,6 +565,12 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 - `.\backend\mvnw.cmd test`
 - review CI YAML for syntax correctness
 
+**Frontend Companion Work:**
+
+- confirm frontend local startup, environment variables, and build scripts are documented correctly
+- ensure frontend CI steps still reflect actual workspace commands
+- clean any temporary UI scaffolding that no longer matches the real API contract
+
 **Commit Message:**
 
 `task 1.11: add ci and operational delivery baseline`
@@ -516,6 +598,13 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
    - read order detail
 5. Confirm audit logs exist for the approval and payment path.
 6. Confirm duplicate webhook replay does not duplicate order creation.
+7. Run buyer-web smoke flow against the completed Phase 1 backend:
+   - register or login
+   - browse products
+   - add variant to cart
+   - create checkout session
+   - complete mock payment path
+   - view order confirmation or order detail
 
 **Verification:**
 
@@ -523,6 +612,9 @@ If you need to rebuild Program 0 from scratch, use the full production plan as t
 .\backend\mvnw.cmd test
 .\backend\mvnw.cmd -q -DskipTests compile
 .\backend\mvnw.cmd spring-boot:run
+pnpm --dir frontend lint
+pnpm --dir frontend test --run
+pnpm --dir frontend build
 ```
 
 **Commit Message:**
@@ -543,6 +635,7 @@ The plan is complete only when all of the following are true:
 - seller application and admin approval work
 - audit records exist for privileged and finance-sensitive flows
 - OpenAPI, README, and runbooks reflect the implemented behavior
+- buyer frontend integrates with the completed Phase 1 backend milestones without relying on stale mocks
 
 ## What This Plan Deliberately Leaves for Later
 

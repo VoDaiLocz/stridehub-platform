@@ -34,6 +34,18 @@ This plan is split into five execution programs:
 - Program 3: Financial and operational integrity
 - Program 4: Scale and production readiness
 
+### 1.2.1 Backend-to-Frontend Delivery Cadence
+
+- backend remains the contract owner for auth, catalog, checkout, and order logic
+- frontend should begin as soon as a backend milestone is verified, not after the entire backend roadmap is complete
+- every Program 1 and Program 2 task that materially changes buyer or seller experience should carry a frontend companion scope
+- the delivery rhythm is:
+  1. implement backend capability
+  2. verify backend contract
+  3. wire frontend screen, state, or integration against that contract
+  4. run an integration checkpoint before advancing
+- seller/admin internal UI may lag buyer UI when the backend boundary is still the higher priority
+
 ### 1.3 Branch and Commit Policy
 
 - If this remains a single local repo, commits may land on `main`.
@@ -360,6 +372,13 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 - Integration tests for register, login, and refresh
 - Role assignment tests
 
+**Frontend Companion Scope:**
+
+- add buyer auth entry points for register and login
+- wire frontend token lifecycle and current-profile bootstrap
+- add signed-in vs signed-out header state
+- introduce route guard or protected-layout placeholder for account-aware pages
+
 **Commit Message:**
 
 `task 1.1: implement identity and token lifecycle`
@@ -398,6 +417,12 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 - Endpoint tests for listing and detail
 - Tests that non-active products are hidden
 
+**Frontend Companion Scope:**
+
+- build buyer home sections from category, brand, and featured product APIs
+- build product listing page and product detail page using live catalog responses
+- implement filter UI for category, brand, size, and color where the backend already supports it
+
 **Commit Message:**
 
 `task 1.2: add catalog browsing and product detail endpoints`
@@ -433,6 +458,12 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 
 - Unit tests for reservation rules
 - Concurrency integration test for low-stock race
+
+**Frontend Companion Scope:**
+
+- reflect inventory state in listing cards and product detail screens
+- disable unavailable variants and surface low-stock messaging
+- keep backend stock truth authoritative; frontend should render hints only
 
 **Commit Message:**
 
@@ -470,6 +501,12 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 - Cart CRUD API tests
 - Ownership isolation tests
 
+**Frontend Companion Scope:**
+
+- implement buyer cart page or cart drawer
+- wire add, update, and remove flows against the cart API
+- render backend subtotal and validation feedback directly
+
 **Commit Message:**
 
 `task 1.4: add persistent buyer cart management`
@@ -505,6 +542,12 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 
 - Checkout creation tests
 - Out-of-stock and inactive-variant tests
+
+**Frontend Companion Scope:**
+
+- implement checkout screen with summary, address shell, and session creation flow
+- show revalidation failures clearly when cart assumptions are stale
+- render reservation expiry countdown or timeout warning
 
 **Commit Message:**
 
@@ -543,6 +586,12 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 - Duplicate webhook replay tests
 - Invalid signature tests
 
+**Frontend Companion Scope:**
+
+- connect the checkout screen to payment initiation
+- implement pending, failed, and success payment states
+- prepare redirect or local mock-provider handling for the buyer flow
+
 **Commit Message:**
 
 `task 1.6: implement payment request and webhook confirmation`
@@ -580,6 +629,12 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 - Payment-success-to-order integration test
 - Duplicate-order prevention test
 
+**Frontend Companion Scope:**
+
+- implement order confirmation page
+- implement buyer order history and order detail views
+- display immutable order snapshot data rather than live catalog data
+
 **Commit Message:**
 
 `task 1.7: confirm paid checkouts into orders`
@@ -615,6 +670,11 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 - Duplicate application tests
 - Auth boundary tests
 
+**Frontend Companion Scope:**
+
+- add seller application submission screen in the buyer account area
+- add seller application status display for pending, approved, and rejected cases
+
 **Commit Message:**
 
 `task 2.1: add seller application workflow`
@@ -647,6 +707,11 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 
 - Admin-only endpoint tests
 - State transition tests
+
+**Frontend Companion Scope:**
+
+- buyer-facing frontend needs only status reflection after admin decisions
+- internal admin UI can stay deferred unless the project later adds a separate admin workspace
 
 **Commit Message:**
 
@@ -681,6 +746,11 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 - Tests that unapproved seller cannot publish
 - Ownership isolation tests
 
+**Frontend Companion Scope:**
+
+- no buyer-facing page is required immediately
+- reserve seller portal work for a future internal frontend slice after buyer commerce flow is stable
+
 **Commit Message:**
 
 `task 2.3: add seller product draft and review submission flows`
@@ -712,6 +782,11 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 
 - Tests for moderation visibility behavior
 
+**Frontend Companion Scope:**
+
+- buyer storefront should react automatically because catalog visibility is backend-driven
+- no separate buyer UI task is needed beyond removing any stale mocked product data
+
 **Commit Message:**
 
 `task 2.4: implement product moderation workflow`
@@ -741,6 +816,11 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 
 - Stock adjustment tests
 - Ownership and status tests
+
+**Frontend Companion Scope:**
+
+- no buyer UI change is required beyond inventory-aware availability updates already covered earlier
+- seller-facing UI remains optional until a dedicated internal frontend track is started
 
 **Commit Message:**
 
@@ -1062,6 +1142,7 @@ The following scenarios are mandatory before declaring the product delivery-read
 6. Create payment intent.
 7. Simulate successful provider webhook.
 8. Confirm order appears in buyer order read model.
+9. Confirm the buyer frontend can traverse the same flow without API mocks for completed milestones.
 
 ### Scenario B: Duplicate Webhook Safety
 
@@ -1105,6 +1186,7 @@ The following scenarios are mandatory before declaring the product delivery-read
 - buyer can authenticate, browse, cart, checkout, pay, and see a confirmed order
 - duplicate payment callback does not duplicate order confirmation
 - stock reservation path exists and is tested
+- buyer frontend is integrated through the completed Program 1 API milestones
 
 ### Program 2 Done
 
@@ -1144,6 +1226,7 @@ Then verify manually:
 - seller approval path works
 - audit data exists
 - metrics endpoints are accessible as intended
+- buyer frontend can execute the completed commerce flow against real backend APIs
 
 ## 13. Recommended Commit Sequence
 
