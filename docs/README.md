@@ -4,6 +4,7 @@ StrideHub is a production-style `multi-vendor footwear marketplace` delivered as
 
 ## Documentation Map
 
+- [Execution Checklist and Progress Tracker](../PROGRESS.md)
 - [Product Requirements Document](./prd.md)
 - [Enterprise Delivery Plan](./plans/2026-04-02-stridehub-enterprise-plan.md)
 - [Detailed Phase 1 Execution Plan](./plans/2026-04-02-stridehub-phase-1-execution-plan.md)

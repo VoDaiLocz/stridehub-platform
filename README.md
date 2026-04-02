@@ -81,6 +81,7 @@ This repository contains both:
 ## Documentation
 
 - [Documentation Index](./docs/README.md)
+- [Execution Checklist and Progress Tracker](./PROGRESS.md)
 - [Backend Workspace Guide](./backend/README.md)
 - [Frontend Workspace Guide](./frontend/README.md)
 
