@@ -54,6 +54,7 @@ stridehub:
   payment:
     provider: mock-gateway
     webhook-signature-header: X-Signature
+    webhook-secret: ${STRIDEHUB_PAYMENT_WEBHOOK_SECRET:mock-webhook-secret}
   audit:
     correlation-id-header: X-Correlation-Id
   web:

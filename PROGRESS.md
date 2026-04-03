@@ -31,8 +31,8 @@ This file is the day-to-day execution checklist for the repository. It is meant 
 - [x] Program 0 foundation is complete.
 - [x] Backend compile and test baseline already runs.
 - [x] Frontend buyer shell is scaffolded.
-- [-] Commerce core implementation is in progress through checkout.
-- [-] Current recommended next task: `Task 1.6`.
+- [-] Commerce core implementation is in progress through payment.
+- [-] Current recommended next task: `Task 1.7`.
 
 ## Task Execution Workflow
 
@@ -216,14 +216,14 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 
 **Goal:** support payment initiation and webhook-driven payment confirmation safely.
 
-- [ ] Create payment package structure.
-- [ ] Implement `Payment` and `PaymentAttempt`.
-- [ ] Introduce provider abstraction interface for external gateway integration.
-- [ ] Implement payment intent or equivalent initiation API.
-- [ ] Implement signed webhook callback handling.
-- [ ] Make webhook processing idempotent.
-- [ ] Ensure webhook does not create duplicate confirmations.
-- [ ] Add tests for duplicate callback behavior and signature validation.
+- [x] Create payment package structure.
+- [x] Implement `Payment` and `PaymentAttempt`.
+- [x] Introduce provider abstraction interface for external gateway integration.
+- [x] Implement payment intent or equivalent initiation API.
+- [x] Implement signed webhook callback handling.
+- [x] Make webhook processing idempotent.
+- [x] Ensure webhook does not create duplicate confirmations.
+- [x] Add tests for duplicate callback behavior and signature validation.
 - [ ] Update OpenAPI payment and webhook contract.
 - [ ] Commit as `task 1.6: implement payment provider abstraction and webhook flow`.
 
@@ -488,3 +488,4 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 ## Execution Log
 
 - `2026-04-04 00:54 +07:00` Task `1.5` verified locally with `.\mvnw.cmd test` (`63` tests, `0` failures) and `.\mvnw.cmd -q -DskipTests compile` before commit.
+- `2026-04-04 01:13 +07:00` Task `1.6` verified locally with `.\mvnw.cmd test` (`67` tests, `0` failures), `.\mvnw.cmd -q -DskipTests compile`, and payment-focused test coverage before commit.

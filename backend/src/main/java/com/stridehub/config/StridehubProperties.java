@@ -63,6 +63,9 @@ public class StridehubProperties {
         @NotBlank
         private String webhookSignatureHeader = "X-Signature";
 
+        @NotBlank
+        private String webhookSecret = "mock-webhook-secret";
+
         public String getProvider() {
             return provider;
         }
@@ -77,6 +80,14 @@ public class StridehubProperties {
 
         public void setWebhookSignatureHeader(String webhookSignatureHeader) {
             this.webhookSignatureHeader = webhookSignatureHeader;
+        }
+
+        public String getWebhookSecret() {
+            return webhookSecret;
+        }
+
+        public void setWebhookSecret(String webhookSecret) {
+            this.webhookSecret = webhookSecret;
         }
     }
 

@@ -37,7 +37,8 @@ public class SecurityConfig {
             "/api/v1/identity/register",
             "/api/v1/identity/login",
             "/api/v1/identity/refresh",
-            "/api/v1/catalog/**"
+            "/api/v1/catalog/**",
+            "/api/v1/webhooks/payment/**"
     };
 
     @Bean
