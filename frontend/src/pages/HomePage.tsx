@@ -1,6 +1,44 @@
 import React from 'react';
 import FeatureSection from '../components/home/FeatureSection';
+import ProductGrid from '../components/catalog/ProductGrid';
 import './HomePage.css';
+
+const MOCK_PRODUCTS = [
+  {
+    id: '1',
+    name: 'Everyday Move',
+    price: 135.00,
+    category: 'Men\'s Sneakers',
+    image: '/images/vessi.com/shoe-1.jpg',
+    stock: 12,
+    isNew: true
+  },
+  {
+    id: '2',
+    name: 'Weekend Sneaker',
+    price: 110.00,
+    category: 'Unisex',
+    image: '/images/vessi.com/shoe-2.jpg',
+    stock: 3, // Low Stock
+  },
+  {
+    id: '3',
+    name: 'Stormside Boot',
+    price: 165.00,
+    category: 'All-Weather',
+    image: '/images/vessi.com/shoe-3.jpg',
+    stock: 0, // Out of Stock
+  },
+  {
+    id: '4',
+    name: 'Sunday Slipper',
+    price: 85.00,
+    category: 'Home & Travel',
+    image: '/images/vessi.com/shoe-4.jpg',
+    stock: 25,
+    isNew: true
+  }
+];
 
 const HomePage: React.FC = () => {
   return (
@@ -9,7 +47,7 @@ const HomePage: React.FC = () => {
       <section className="hero">
         <div className="hero-background">
           <img 
-            src="/images/hero-banner.webp" 
+            src="/images/vessi.com/hero.webp" 
             alt="Person walking in rain wearing StrideHub shoes" 
           />
           <div className="hero-overlay"></div>
@@ -27,6 +65,13 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Best Sellers Grid - Task 1.3.2 Implementation */}
+      <ProductGrid 
+        subtitle="Customer Favorites"
+        title="Our Best Sellers"
+        products={MOCK_PRODUCTS}
+      />
 
       {/* Storytelling Sections */}
         <FeatureSection
@@ -58,3 +103,4 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
+
