@@ -1,6 +1,8 @@
 package com.stridehub.payment.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stridehub.audit.application.AuditService;
+import com.stridehub.audit.application.OutboxService;
 import com.stridehub.checkout.domain.CheckoutSession;
 import com.stridehub.checkout.domain.CheckoutSessionStatus;
 import com.stridehub.checkout.infrastructure.CheckoutSessionRepository;
@@ -9,6 +11,7 @@ import com.stridehub.common.exception.ConflictException;
 import com.stridehub.common.exception.NotFoundException;
 import com.stridehub.common.time.TimeProvider;
 import com.stridehub.config.StridehubProperties;
+import com.stridehub.order.domain.Order;
 import com.stridehub.order.application.OrderService;
 import com.stridehub.payment.domain.Payment;
 import com.stridehub.payment.domain.PaymentAttempt;
@@ -34,6 +37,8 @@ public class PaymentService {
     private final StridehubProperties stridehubProperties;
     private final TimeProvider timeProvider;
     private final OrderService orderService;
+    private final AuditService auditService;
+    private final OutboxService outboxService;
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     public PaymentService(
@@ -43,7 +48,9 @@ public class PaymentService {
             PaymentProvider paymentProvider,
             StridehubProperties stridehubProperties,
             TimeProvider timeProvider,
-            OrderService orderService
+            OrderService orderService,
+            AuditService auditService,
+            OutboxService outboxService
     ) {
         this.checkoutSessionRepository = checkoutSessionRepository;
         this.paymentRepository = paymentRepository;
@@ -52,6 +59,8 @@ public class PaymentService {
         this.stridehubProperties = stridehubProperties;
         this.timeProvider = timeProvider;
         this.orderService = orderService;
+        this.auditService = auditService;
+        this.outboxService = outboxService;
     }
 
     @Transactional
@@ -131,11 +140,46 @@ public class PaymentService {
         switch (event.eventType()) {
             case "payment.captured" -> {
                 payment.markCaptured(attemptedAt);
-                orderService.confirmCapturedPayment(payment);
+                auditService.recordSystemAction(
+                        "payment.captured",
+                        "payment",
+                        payment.getId(),
+                        null,
+                        java.util.Map.of(
+                                "providerReference", payment.getProviderPaymentRef(),
+                                "checkoutSessionId", payment.getCheckoutSession().getId()
+                        )
+                );
+                outboxService.enqueue(
+                        "payment",
+                        payment.getId(),
+                        "payment.captured",
+                        java.util.Map.of(
+                                "paymentId", payment.getId(),
+                                "providerReference", payment.getProviderPaymentRef(),
+                                "checkoutSessionId", payment.getCheckoutSession().getId(),
+                                "amount", payment.getAmount(),
+                                "currencyCode", payment.getCurrencyCode()
+                        )
+                );
+                Order confirmedOrder = orderService.confirmCapturedPayment(payment);
+                if (confirmedOrder == null) {
+                    throw new ConflictException("payment.order_confirmation_failed", "Order confirmation did not complete");
+                }
             }
             case "payment.failed" -> {
                 payment.markFailed("provider_reported_failure");
                 payment.getCheckoutSession().markPaymentFailed();
+                auditService.recordSystemAction(
+                        "payment.failed",
+                        "payment",
+                        payment.getId(),
+                        "provider_reported_failure",
+                        java.util.Map.of(
+                                "providerReference", payment.getProviderPaymentRef(),
+                                "checkoutSessionId", payment.getCheckoutSession().getId()
+                        )
+                );
             }
             default -> throw new ConflictException("payment.unsupported_event", "Unsupported payment webhook event");
         }

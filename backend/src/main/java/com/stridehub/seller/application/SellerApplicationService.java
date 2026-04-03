@@ -1,5 +1,7 @@
 package com.stridehub.seller.application;
 
+import com.stridehub.audit.application.AuditService;
+import com.stridehub.audit.application.OutboxService;
 import com.stridehub.common.exception.ConflictException;
 import com.stridehub.common.exception.NotFoundException;
 import com.stridehub.common.time.TimeProvider;
@@ -18,15 +20,21 @@ public class SellerApplicationService {
     private final SellerApplicationRepository sellerApplicationRepository;
     private final UserRepository userRepository;
     private final TimeProvider timeProvider;
+    private final AuditService auditService;
+    private final OutboxService outboxService;
 
     public SellerApplicationService(
             SellerApplicationRepository sellerApplicationRepository,
             UserRepository userRepository,
-            TimeProvider timeProvider
+            TimeProvider timeProvider,
+            AuditService auditService,
+            OutboxService outboxService
     ) {
         this.sellerApplicationRepository = sellerApplicationRepository;
         this.userRepository = userRepository;
         this.timeProvider = timeProvider;
+        this.auditService = auditService;
+        this.outboxService = outboxService;
     }
 
     @Transactional
@@ -48,7 +56,30 @@ public class SellerApplicationService {
                 legalName,
                 timeProvider.now()
         );
-        return toResponse(sellerApplicationRepository.save(application));
+        SellerApplication savedApplication = sellerApplicationRepository.save(application);
+        auditService.recordUserAction(
+                userId,
+                "seller.application_submitted",
+                "seller_application",
+                savedApplication.getId(),
+                null,
+                java.util.Map.of(
+                        "storeName", savedApplication.getStoreName(),
+                        "status", savedApplication.getStatus().name()
+                )
+        );
+        outboxService.enqueue(
+                "seller_application",
+                savedApplication.getId(),
+                "seller.application.submitted",
+                java.util.Map.of(
+                        "applicationId", savedApplication.getId(),
+                        "userId", userId,
+                        "storeName", savedApplication.getStoreName(),
+                        "status", savedApplication.getStatus().name()
+                )
+        );
+        return toResponse(savedApplication);
     }
 
     @Transactional(readOnly = true)

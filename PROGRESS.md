@@ -31,8 +31,8 @@ This file is the day-to-day execution checklist for the repository. It is meant 
 - [x] Program 0 foundation is complete.
 - [x] Backend compile and test baseline already runs.
 - [x] Frontend buyer shell is scaffolded.
-- [-] Commerce core implementation is in progress through seller application.
-- [-] Current recommended next task: `Task 1.9`.
+- [-] Commerce core implementation is in progress through audit and outbox foundation.
+- [-] Current recommended next task: `Task 1.10`.
 
 ## Task Execution Workflow
 
@@ -258,13 +258,13 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 
 **Goal:** add the base operational integrity layer needed before later governance and refund flows.
 
-- [ ] Implement `AuditLog`.
-- [ ] Implement `OutboxEvent`.
-- [ ] Capture privileged actor and reason where applicable.
-- [ ] Record key domain events for payment, order, and admin-sensitive actions.
-- [ ] Add tests that audit and outbox entries are persisted on critical transitions.
+- [x] Implement `AuditLog`.
+- [x] Implement `OutboxEvent`.
+- [x] Capture privileged actor and reason where applicable.
+- [x] Record key domain events for payment, order, and seller-application transitions.
+- [x] Add tests that audit and outbox entries are persisted on critical transitions.
 - [ ] Update architecture and operations docs if event publishing behavior changes.
-- [ ] Commit as `task 1.9: add audit trail and outbox persistence foundation`.
+- [x] Commit as `task 1.9: add audit trail and outbox persistence foundation`.
 
 ### Task 1.10: Tighten API Documentation and Error Contract
 
@@ -492,3 +492,4 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - `2026-04-04 01:13 +07:00` Task `1.6` verified locally with `.\mvnw.cmd test` (`67` tests, `0` failures), `.\mvnw.cmd -q -DskipTests compile`, and payment-focused test coverage before commit.
 - `2026-04-04 01:30 +07:00` Task `1.7` verified locally with `.\mvnw.cmd -Dtest=OrderControllerIntegrationTest test`, `.\mvnw.cmd test` (`69` tests, `0` failures), and `.\mvnw.cmd -q -DskipTests compile` before commit.
 - `2026-04-04 01:39 +07:00` Task `1.8` verified locally with `.\mvnw.cmd -Dtest=SellerApplicationControllerIntegrationTest test` and `.\mvnw.cmd -q -DskipTests compile` before commit.
+- `2026-04-04 01:50 +07:00` Task `1.9` verified locally with `.\mvnw.cmd -Dtest=AuditOutboxIntegrationTest test`, `.\mvnw.cmd test` (`75` tests, `0` failures), and `.\mvnw.cmd -q -DskipTests compile` before commit.

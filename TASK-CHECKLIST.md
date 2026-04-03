@@ -17,8 +17,8 @@ For implementation detail, use these source documents:
 
 ## Current Execution Position
 
-- Current repository baseline: `Program 0 complete, Program 1 through Task 1.8 in progress`
-- Current recommended next task: `Task 1.9`
+- Current repository baseline: `Program 0 complete, Program 1 through Task 1.9 in progress`
+- Current recommended next task: `Task 1.10`
 - Current execution mode: `follow numbered tasks in order`
 
 ## Phase Summary
@@ -49,7 +49,7 @@ For implementation detail, use these source documents:
 | 1 | 1.6 | Implement Payment Module with Provider Abstraction | `backend/payment` | `[x]` | `1.5` | payment initiation, provider abstraction, signed webhook handling, idempotency | payment pending/success/failure flow in buyer web | duplicate webhook tests + signature validation tests | `task 1.6` |
 | 1 | 1.7 | Implement Order Module | `backend/order` | `[x]` | `1.5`, `1.6` | order creation from payment-confirmed checkout, state machine, buyer order access | order confirmation, order history, order detail pages | order lifecycle tests + duplicate confirm tests | `task 1.7` |
 | 1 | 1.8 | Implement Seller Application Workflow | `backend/seller` | `[x]` | `1.1` | seller application submission baseline | seller application form and status view in account area | seller application tests | `task 1.8` |
-| 1 | 1.9 | Implement Audit and Outbox Foundation | `backend/audit` + shared persistence | `[ ]` | `1.6`, `1.7`, `1.8` | initial audit log and outbox persistence for critical transitions | expose only safe status breadcrumbs; no major new page | audit/outbox persistence tests | `task 1.9` |
+| 1 | 1.9 | Implement Audit and Outbox Foundation | `backend/audit` + shared persistence | `[x]` | `1.6`, `1.7`, `1.8` | initial audit log and outbox persistence for critical transitions | expose only safe status breadcrumbs; no major new page | audit/outbox persistence tests | `task 1.9` |
 | 1 | 1.10 | Tighten API Documentation and Error Contract | `docs/` + backend web layer | `[ ]` | `1.1` to `1.9` | OpenAPI, path/versioning, error-envelope alignment | remove stale mocks and sync FE request/response types | docs review against implementation | `task 1.10` |
 | 1 | 1.11 | Add Operational Baseline | root + `backend/` + `frontend/` + docs | `[ ]` | `1.1` to `1.10` | local run hardening, fixtures, health visibility, startup guidance | verify FE env, startup, and build docs/scripts | local run-through + docs checks | `task 1.11` |
 | 1 | 1.12 | Final Phase 1 Verification and Cleanup | monorepo-wide | `[ ]` | `1.1` to `1.11` | clean, stable Phase 1 baseline | run end-to-end buyer smoke flow against real APIs | backend test + compile + frontend lint/test/build + docs review | `task 1.12` |
@@ -83,6 +83,6 @@ For implementation detail, use these source documents:
 
 | Priority | Action | Why |
 | --- | --- | --- |
-| 1 | Implement `Task 1.9` audit and outbox foundation | closes the minimum operational integrity gap in Phase 1 |
-| 2 | Reconcile OpenAPI and path/versioning during `Task 1.10` | documentation still trails the implemented Phase 1 contract |
-| 3 | Finish `Task 1.11` and `1.12` with full verification | closes the operational and documentation gates for Phase 1 |
+| 1 | Reconcile OpenAPI and path/versioning during `Task 1.10` | documentation still trails the implemented Phase 1 contract |
+| 2 | Finish `Task 1.11` and `1.12` with full verification | closes the operational and documentation gates for Phase 1 |
+| 3 | Review docs claims against actual seller/audit baseline | prevents Phase 1 docs from overstating governance scope |

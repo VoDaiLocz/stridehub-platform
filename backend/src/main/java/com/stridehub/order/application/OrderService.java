@@ -1,5 +1,7 @@
 package com.stridehub.order.application;
 
+import com.stridehub.audit.application.AuditService;
+import com.stridehub.audit.application.OutboxService;
 import com.stridehub.cart.domain.Cart;
 import com.stridehub.cart.domain.CartItem;
 import com.stridehub.checkout.domain.CheckoutSession;
@@ -26,15 +28,21 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final InventoryService inventoryService;
     private final TimeProvider timeProvider;
+    private final AuditService auditService;
+    private final OutboxService outboxService;
 
     public OrderService(
             OrderRepository orderRepository,
             InventoryService inventoryService,
-            TimeProvider timeProvider
+            TimeProvider timeProvider,
+            AuditService auditService,
+            OutboxService outboxService
     ) {
         this.orderRepository = orderRepository;
         this.inventoryService = inventoryService;
         this.timeProvider = timeProvider;
+        this.auditService = auditService;
+        this.outboxService = outboxService;
     }
 
     @Transactional
@@ -101,6 +109,32 @@ public class OrderService {
         inventoryService.commitCheckoutReservations(checkoutSession.getId(), savedOrder.getId());
         checkoutSession.markCompleted();
         cart.markCheckedOut();
+        auditService.recordSystemAction(
+                "order.created",
+                "order",
+                savedOrder.getId(),
+                null,
+                java.util.Map.of(
+                        "orderNumber", savedOrder.getOrderNumber(),
+                        "paymentId", payment.getId(),
+                        "checkoutSessionId", checkoutSession.getId(),
+                        "userId", checkoutSession.getUser().getId()
+                )
+        );
+        outboxService.enqueue(
+                "order",
+                savedOrder.getId(),
+                "order.created",
+                java.util.Map.of(
+                        "orderId", savedOrder.getId(),
+                        "orderNumber", savedOrder.getOrderNumber(),
+                        "paymentId", payment.getId(),
+                        "checkoutSessionId", checkoutSession.getId(),
+                        "userId", checkoutSession.getUser().getId(),
+                        "totalAmount", savedOrder.getTotalAmount(),
+                        "currencyCode", savedOrder.getCurrencyCode()
+                )
+        );
         return savedOrder;
     }
 
