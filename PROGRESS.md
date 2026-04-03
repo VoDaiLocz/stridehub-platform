@@ -31,8 +31,8 @@ This file is the day-to-day execution checklist for the repository. It is meant 
 - [x] Program 0 foundation is complete.
 - [x] Backend compile and test baseline already runs.
 - [x] Frontend buyer shell is scaffolded.
-- [-] Commerce core implementation is in progress through order.
-- [-] Current recommended next task: `Task 1.8`.
+- [-] Commerce core implementation is in progress through seller application.
+- [-] Current recommended next task: `Task 1.9`.
 
 ## Task Execution Workflow
 
@@ -245,13 +245,14 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 
 **Goal:** add the first seller-facing onboarding path required before marketplace governance.
 
-- [ ] Implement `SellerApplication`.
-- [ ] Expose buyer-to-seller application submission endpoint.
-- [ ] Validate seller application payload and prevent duplicate active applications.
-- [ ] Prepare admin review path hooks for later tasks.
-- [ ] Add tests for submit and duplicate prevention.
+- [x] Implement `SellerApplication`.
+- [x] Expose buyer-to-seller application submission endpoint.
+- [x] Expose current seller application status endpoint.
+- [x] Validate seller application payload and prevent duplicate active applications.
+- [x] Prepare admin review path hooks for later tasks through baseline entities and repositories.
+- [x] Add tests for submit and duplicate prevention.
 - [ ] Update OpenAPI seller application contract.
-- [ ] Commit as `task 1.8: add seller application submission workflow`.
+- [x] Commit as `task 1.8: add seller application submission workflow`.
 
 ### Task 1.9: Implement Audit and Outbox Foundation
 
@@ -490,3 +491,4 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - `2026-04-04 00:54 +07:00` Task `1.5` verified locally with `.\mvnw.cmd test` (`63` tests, `0` failures) and `.\mvnw.cmd -q -DskipTests compile` before commit.
 - `2026-04-04 01:13 +07:00` Task `1.6` verified locally with `.\mvnw.cmd test` (`67` tests, `0` failures), `.\mvnw.cmd -q -DskipTests compile`, and payment-focused test coverage before commit.
 - `2026-04-04 01:30 +07:00` Task `1.7` verified locally with `.\mvnw.cmd -Dtest=OrderControllerIntegrationTest test`, `.\mvnw.cmd test` (`69` tests, `0` failures), and `.\mvnw.cmd -q -DskipTests compile` before commit.
+- `2026-04-04 01:39 +07:00` Task `1.8` verified locally with `.\mvnw.cmd -Dtest=SellerApplicationControllerIntegrationTest test` and `.\mvnw.cmd -q -DskipTests compile` before commit.
