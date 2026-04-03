@@ -84,21 +84,20 @@ Responsibilities:
 
 Public contracts:
 
-- `/auth/*`
-- `/me/*`
+- `/api/v1/identity/*`
 
 ### Seller Management
 
 Responsibilities:
 
 - seller application submission
-- seller profile lifecycle
-- seller approval and suspension
+- seller profile lifecycle after review
+- seller approval and suspension in later governance phases
 
 Public contracts:
 
-- `/seller/applications`
-- `/admin/sellers/*`
+- `/api/v1/seller/application`
+- `/api/v1/admin/sellers/*` in later phases
 
 ### Catalog
 
@@ -110,9 +109,9 @@ Responsibilities:
 
 Public contracts:
 
-- `/catalog/*`
-- `/seller/products/*`
-- `/admin/products/*`
+- `/api/v1/catalog/*`
+- `/api/v1/seller/products/*` in later phases
+- `/api/v1/admin/products/*` in later phases
 
 ### Inventory
 
@@ -136,8 +135,8 @@ Responsibilities:
 
 Public contracts:
 
-- `/cart/*`
-- `/checkout/*`
+- `/api/v1/cart/*`
+- `/api/v1/checkout/*`
 
 ### Payment
 
@@ -150,8 +149,8 @@ Responsibilities:
 
 Public contracts:
 
-- `/checkout/payment-intent`
-- `/webhooks/payment/*`
+- `/api/v1/checkout/payment-intent`
+- `/api/v1/webhooks/payment/*`
 
 ### Order Management
 
@@ -164,19 +163,19 @@ Responsibilities:
 
 Public contracts:
 
-- `/orders/*`
+- `/api/v1/orders/*`
 
 ### Admin & Audit
 
 Responsibilities:
 
-- privileged moderation actions
-- operational overrides
-- audit log persistence and search
+- audit log persistence and outbox baseline in Phase 1
+- privileged moderation actions in later phases
+- operational overrides and search in later phases
 
 Public contracts:
 
-- `/admin/*`
+- `/api/v1/admin/*` in later phases
 
 ## 6. Key Integration Principles
 

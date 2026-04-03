@@ -1,31 +1,42 @@
 openapi: 3.1.0
 info:
   title: StrideHub API
-  version: 0.1.0
+  version: 1.0.0-phase1
   description: >
-    Baseline OpenAPI contract for the first production slice of the StrideHub
-    marketplace backend. This specification focuses on the highest-value public
-    workflows: authentication, catalog discovery, cart, checkout, orders,
-    seller onboarding, and admin approval. This file is the design-time target
-    contract for the first business slice; the runtime `/v3/api-docs` endpoint
-    currently exposes only the Program 0 foundation endpoints already
-    implemented in code.
+    Manual OpenAPI contract aligned with the implemented Phase 1 StrideHub backend.
+    All business endpoints use the `/api/v1` prefix. The runtime `/v3/api-docs`
+    endpoint should expose the same route set for the implemented controllers.
 servers:
   - url: http://localhost:8080
     description: Local development
 tags:
-  - name: Auth
+  - name: System
+  - name: Identity
   - name: Catalog
   - name: Cart
   - name: Checkout
   - name: Orders
   - name: Seller
-  - name: Admin
   - name: Payment Webhooks
 paths:
-  /auth/register:
+  /api/v1/system/ping:
+    get:
+      tags: [System]
+      summary: Verify the API is alive and returning correlation-aware envelopes
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Ping response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemPingEnvelope'
+        '401':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/identity/register:
     post:
-      tags: [Auth]
+      tags: [Identity]
       summary: Register a buyer account
       requestBody:
         required: true
@@ -39,11 +50,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthEnvelope'
-  /auth/login:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '409':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/identity/login:
     post:
-      tags: [Auth]
-      summary: Authenticate a user
+      tags: [Identity]
+      summary: Authenticate a user and return access plus refresh tokens
       requestBody:
         required: true
         content:
@@ -56,11 +71,77 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthEnvelope'
-  /catalog/products:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/identity/refresh:
+    post:
+      tags: [Identity]
+      summary: Rotate refresh token and mint a new access token pair
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: Token pair rotated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/identity/me:
+    get:
+      tags: [Identity]
+      summary: Return the authenticated user profile
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileResponse'
+        '401':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/catalog/categories:
     get:
       tags: [Catalog]
-      summary: Search products
+      summary: List active categories
+      responses:
+        '200':
+          description: Category list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogCategoryResponse'
+  /api/v1/catalog/brands:
+    get:
+      tags: [Catalog]
+      summary: List active brands
+      responses:
+        '200':
+          description: Brand list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CatalogBrandResponse'
+  /api/v1/catalog/products:
+    get:
+      tags: [Catalog]
+      summary: List active products with optional buyer filters
       parameters:
         - in: query
           name: category
@@ -78,25 +159,14 @@ paths:
           name: color
           schema:
             type: string
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 0
-        - in: query
-          name: sizeLimit
-          schema:
-            type: integer
-            minimum: 1
-            maximum: 100
       responses:
         '200':
-          description: Paged product search results
+          description: Product list
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductSearchResponse'
-  /catalog/products/{slug}:
+                $ref: '#/components/schemas/CatalogProductListResponse'
+  /api/v1/catalog/products/{slug}:
     get:
       tags: [Catalog]
       summary: Get product detail by slug
@@ -112,26 +182,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductDetail'
+                $ref: '#/components/schemas/CatalogProductDetailResponse'
         '404':
-          description: Product not found
-  /cart:
+          $ref: '#/components/responses/ApiError'
+  /api/v1/cart:
     get:
       tags: [Cart]
-      summary: Get current buyer cart
+      summary: Get the authenticated buyer cart
       security:
         - bearerAuth: []
       responses:
         '200':
-          description: Cart state
+          description: Current cart
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/CartResponse'
-  /cart/items:
+        '401':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/cart/items:
     post:
       tags: [Cart]
-      summary: Add or update a cart item
+      summary: Add an item to the current cart
       security:
         - bearerAuth: []
       requestBody:
@@ -147,10 +219,73 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CartResponse'
-  /checkout/sessions:
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/ApiError'
+        '404':
+          $ref: '#/components/responses/ApiError'
+        '409':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/cart/items/{itemId}:
+    patch:
+      tags: [Cart]
+      summary: Update cart item quantity
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CartItemQuantityUpdateRequest'
+      responses:
+        '200':
+          description: Updated cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/ApiError'
+        '404':
+          $ref: '#/components/responses/ApiError'
+    delete:
+      tags: [Cart]
+      summary: Remove an item from the cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: itemId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Updated cart after removal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '401':
+          $ref: '#/components/responses/ApiError'
+        '404':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/checkout/sessions:
     post:
       tags: [Checkout]
-      summary: Create a checkout session
+      summary: Create a checkout session from the active cart
       security:
         - bearerAuth: []
       requestBody:
@@ -166,10 +301,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CheckoutSessionResponse'
-  /checkout/payment-intent:
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/ApiError'
+        '409':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/checkout/payment-intent:
     post:
       tags: [Checkout]
-      summary: Create a payment request for an active checkout session
+      summary: Create a provider payment request for an active checkout session
       security:
         - bearerAuth: []
       requestBody:
@@ -180,20 +321,45 @@ paths:
               $ref: '#/components/schemas/PaymentIntentRequest'
       responses:
         '200':
-          description: Payment initiated
+          description: Payment request initialized
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaymentIntentResponse'
-  /orders/{id}:
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/ApiError'
+        '404':
+          $ref: '#/components/responses/ApiError'
+        '409':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/orders:
     get:
       tags: [Orders]
-      summary: Get order detail
+      summary: List orders for the authenticated buyer
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Buyer order summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderSummaryResponse'
+        '401':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/orders/{orderId}:
+    get:
+      tags: [Orders]
+      summary: Get a buyer order by ID
       security:
         - bearerAuth: []
       parameters:
         - in: path
-          name: id
+          name: orderId
           required: true
           schema:
             type: string
@@ -205,10 +371,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OrderResponse'
-  /seller/applications:
+        '401':
+          $ref: '#/components/responses/ApiError'
+        '404':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/seller/application:
     post:
       tags: [Seller]
-      summary: Submit a seller application
+      summary: Submit the current buyer's seller application
       security:
         - bearerAuth: []
       requestBody:
@@ -224,32 +394,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SellerApplicationResponse'
-  /admin/sellers/{sellerId}/approve:
-    post:
-      tags: [Admin]
-      summary: Approve a seller application
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/ApiError'
+        '409':
+          $ref: '#/components/responses/ApiError'
+    get:
+      tags: [Seller]
+      summary: Get the current user's seller application
       security:
         - bearerAuth: []
-      parameters:
-        - in: path
-          name: sellerId
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AdminDecisionRequest'
       responses:
         '200':
-          description: Seller approved
-  /webhooks/payment/provider:
+          description: Current seller application
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SellerApplicationResponse'
+        '401':
+          $ref: '#/components/responses/ApiError'
+        '404':
+          $ref: '#/components/responses/ApiError'
+  /api/v1/webhooks/payment/provider:
     post:
       tags: [Payment Webhooks]
-      summary: Receive signed payment webhook events
+      summary: Receive signed payment provider events
       parameters:
         - in: header
           name: X-Signature
@@ -261,52 +431,121 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PaymentWebhookEvent'
+              $ref: '#/components/schemas/PaymentWebhookEventRequest'
       responses:
         '202':
           description: Webhook accepted for processing
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '401':
+          $ref: '#/components/responses/ApiError'
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  responses:
+    ApiError:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
+    ValidationError:
+      description: Validation failure
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiErrorResponse'
   schemas:
-    AuthEnvelope:
+    ApiErrorResponse:
       type: object
+      required: [code, message, details, timestamp, correlationId, path]
       properties:
-        accessToken:
+        code:
           type: string
-        refreshToken:
+        message:
           type: string
-        user:
-          $ref: '#/components/schemas/UserSummary'
-      required: [accessToken, refreshToken, user]
+        details:
+          type: array
+          items:
+            type: string
+        timestamp:
+          type: string
+          format: date-time
+        correlationId:
+          type: string
+        path:
+          type: string
+    SystemPingEnvelope:
+      type: object
+      required: [success, data, timestamp, correlationId]
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: '#/components/schemas/SystemPingResponse'
+        timestamp:
+          type: string
+          format: date-time
+        correlationId:
+          type: string
+    SystemPingResponse:
+      type: object
+      required: [service, timestamp, activeProfiles]
+      properties:
+        service:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        activeProfiles:
+          type: array
+          items:
+            type: string
     RegisterRequest:
       type: object
+      required: [name, email, password]
       properties:
+        name:
+          type: string
+          maxLength: 120
         email:
           type: string
           format: email
         password:
           type: string
           minLength: 8
-        firstName:
-          type: string
-        lastName:
-          type: string
-      required: [email, password, firstName, lastName]
+          maxLength: 72
     LoginRequest:
       type: object
+      required: [email, password]
       properties:
         email:
           type: string
           format: email
         password:
           type: string
-      required: [email, password]
-    UserSummary:
+    RefreshRequest:
       type: object
+      required: [refreshToken]
+      properties:
+        refreshToken:
+          type: string
+    AuthResponse:
+      type: object
+      required: [accessToken, refreshToken, user]
+      properties:
+        accessToken:
+          type: string
+        refreshToken:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserProfileResponse'
+    UserProfileResponse:
+      type: object
+      required: [id, email, name, emailVerified, status, roles]
       properties:
         id:
           type: string
@@ -314,66 +553,69 @@ components:
         email:
           type: string
           format: email
+        name:
+          type: string
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        emailVerified:
+          type: boolean
+        status:
+          type: string
         roles:
           type: array
           items:
             type: string
-      required: [id, email, roles]
-    ProductSearchResponse:
+    CatalogCategoryResponse:
       type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductSummary'
-        page:
-          type: integer
-        totalPages:
-          type: integer
-      required: [items, page, totalPages]
-    ProductSummary:
-      type: object
+      required: [id, name, slug]
       properties:
         id:
           type: string
           format: uuid
-        slug:
-          type: string
         name:
           type: string
-        brand:
+        slug:
           type: string
-        minPrice:
-          type: number
-        currency:
-          type: string
-        imageUrl:
-          type: string
-          format: uri
-      required: [id, slug, name, brand, minPrice, currency]
-    ProductDetail:
+    CatalogBrandResponse:
       type: object
+      required: [id, name, slug]
       properties:
         id:
           type: string
           format: uuid
-        slug:
-          type: string
         name:
           type: string
-        description:
+        slug:
           type: string
-        brand:
-          type: string
-        category:
-          type: string
-        variants:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductVariant'
-      required: [id, slug, name, variants]
-    ProductVariant:
+    CategorySummaryResponse:
       type: object
+      required: [id, name, slug]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+    BrandSummaryResponse:
+      type: object
+      required: [id, name, slug]
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        slug:
+          type: string
+    ProductVariantResponse:
+      type: object
+      required: [id, sku, size, color, price]
       properties:
         id:
           type: string
@@ -386,59 +628,167 @@ components:
           type: string
         price:
           type: number
-        availableQuantity:
+        compareAtPrice:
+          type: number
+          nullable: true
+    CatalogProductImageResponse:
+      type: object
+      required: [id, imageUrl, sortOrder]
+      properties:
+        id:
+          type: string
+          format: uuid
+        variantId:
+          type: string
+          format: uuid
+          nullable: true
+        imageUrl:
+          type: string
+        altText:
+          type: string
+          nullable: true
+        sortOrder:
           type: integer
-      required: [id, sku, size, color, price, availableQuantity]
+    CatalogProductListItemResponse:
+      type: object
+      required: [id, slug, name, shortDescription, currencyCode, category, brand, primaryVariant]
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        name:
+          type: string
+        shortDescription:
+          type: string
+        currencyCode:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategorySummaryResponse'
+        brand:
+          $ref: '#/components/schemas/BrandSummaryResponse'
+        primaryVariant:
+          $ref: '#/components/schemas/ProductVariantResponse'
+        primaryImageUrl:
+          type: string
+          nullable: true
+    CatalogProductListResponse:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogProductListItemResponse'
+    CatalogProductDetailResponse:
+      type: object
+      required:
+        [id, slug, name, shortDescription, longDescription, currencyCode, category, brand, variants, images]
+      properties:
+        id:
+          type: string
+          format: uuid
+        slug:
+          type: string
+        name:
+          type: string
+        shortDescription:
+          type: string
+        longDescription:
+          type: string
+        currencyCode:
+          type: string
+        category:
+          $ref: '#/components/schemas/CategorySummaryResponse'
+        brand:
+          $ref: '#/components/schemas/BrandSummaryResponse'
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductVariantResponse'
+        images:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogProductImageResponse'
     CartItemUpsertRequest:
       type: object
+      required: [variantId, quantity]
       properties:
-        productVariantId:
+        variantId:
           type: string
           format: uuid
         quantity:
           type: integer
           minimum: 1
-      required: [productVariantId, quantity]
-    CartResponse:
+    CartItemQuantityUpdateRequest:
       type: object
+      required: [quantity]
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+    CartItemResponse:
+      type: object
+      required:
+        [id, productId, productName, productSlug, variantId, sku, sizeValue, colorValue, currencyCode, quantity, unitPriceAmount, lineTotalAmount]
       properties:
         id:
           type: string
           format: uuid
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/CartItem'
-        subtotal:
-          type: number
-        currency:
-          type: string
-      required: [id, items, subtotal, currency]
-    CartItem:
-      type: object
-      properties:
-        id:
+        productId:
           type: string
           format: uuid
-        productVariantId:
+        productName:
+          type: string
+        productSlug:
+          type: string
+        variantId:
           type: string
           format: uuid
         sku:
           type: string
+        sizeValue:
+          type: string
+        colorValue:
+          type: string
+        currencyCode:
+          type: string
         quantity:
           type: integer
-        unitPrice:
+        unitPriceAmount:
           type: number
-      required: [id, productVariantId, sku, quantity, unitPrice]
+        lineTotalAmount:
+          type: number
+    CartResponse:
+      type: object
+      required: [id, status, currencyCode, totalItems, subtotalAmount, items]
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        currencyCode:
+          type: string
+        totalItems:
+          type: integer
+        subtotalAmount:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CartItemResponse'
     CheckoutSessionRequest:
       type: object
+      required: [shippingAddressId]
       properties:
         shippingAddressId:
           type: string
           format: uuid
-      required: [shippingAddressId]
     CheckoutSessionResponse:
       type: object
+      required: [id, status, reservationExpiresAt, amount, currency]
       properties:
         id:
           type: string
@@ -452,16 +802,16 @@ components:
           type: number
         currency:
           type: string
-      required: [id, status, reservationExpiresAt, amount, currency]
     PaymentIntentRequest:
       type: object
+      required: [checkoutSessionId]
       properties:
         checkoutSessionId:
           type: string
           format: uuid
-      required: [checkoutSessionId]
     PaymentIntentResponse:
       type: object
+      required: [paymentId, providerReference, redirectUrl]
       properties:
         paymentId:
           type: string
@@ -470,27 +820,9 @@ components:
           type: string
         redirectUrl:
           type: string
-          format: uri
-      required: [paymentId, providerReference]
-    OrderResponse:
+    OrderItemResponse:
       type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        status:
-          type: string
-        totalAmount:
-          type: number
-        currency:
-          type: string
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/OrderItem'
-      required: [id, status, totalAmount, currency, items]
-    OrderItem:
-      type: object
+      required: [productVariantId, sku, quantity, unitPrice]
       properties:
         productVariantId:
           type: string
@@ -501,35 +833,76 @@ components:
           type: integer
         unitPrice:
           type: number
-      required: [productVariantId, sku, quantity, unitPrice]
-    SellerApplicationRequest:
+    OrderSummaryResponse:
       type: object
-      properties:
-        storeName:
-          type: string
-        legalEntityName:
-          type: string
-        contactEmail:
-          type: string
-          format: email
-      required: [storeName, legalEntityName, contactEmail]
-    SellerApplicationResponse:
-      type: object
+      required: [id, orderNumber, status, totalAmount, currency]
       properties:
         id:
           type: string
           format: uuid
+        orderNumber:
+          type: string
         status:
           type: string
-      required: [id, status]
-    AdminDecisionRequest:
-      type: object
-      properties:
-        reason:
+        totalAmount:
+          type: number
+        currency:
           type: string
-      required: [reason]
-    PaymentWebhookEvent:
+    OrderResponse:
       type: object
+      required: [id, orderNumber, status, totalAmount, currency, items]
+      properties:
+        id:
+          type: string
+          format: uuid
+        orderNumber:
+          type: string
+        status:
+          type: string
+        totalAmount:
+          type: number
+        currency:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItemResponse'
+    SellerApplicationRequest:
+      type: object
+      required: [storeName]
+      properties:
+        storeName:
+          type: string
+        legalName:
+          type: string
+          nullable: true
+    SellerApplicationResponse:
+      type: object
+      required: [id, storeName, status, submittedAt]
+      properties:
+        id:
+          type: string
+          format: uuid
+        storeName:
+          type: string
+        legalName:
+          type: string
+          nullable: true
+        status:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+        reviewedAt:
+          type: string
+          format: date-time
+          nullable: true
+        rejectionReason:
+          type: string
+          nullable: true
+    PaymentWebhookEventRequest:
+      type: object
+      required: [eventId, providerReference, eventType]
       properties:
         eventId:
           type: string
@@ -539,6 +912,7 @@ components:
           type: string
         amount:
           type: number
+          nullable: true
         currency:
           type: string
-      required: [eventId, providerReference, eventType]
+          nullable: true

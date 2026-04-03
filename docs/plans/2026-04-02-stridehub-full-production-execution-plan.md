@@ -365,7 +365,7 @@ Program 0 is already complete on the current `main` branch. In practice, the bas
 3. Implement register flow with hashed password.
 4. Implement login issuing access and refresh tokens.
 5. Implement refresh flow that rotates token pairs.
-6. Add `/me` endpoint.
+6. Add `/api/v1/identity/me` endpoint.
 
 **Verification:**
 
@@ -396,7 +396,7 @@ Deliver the buyer-facing authentication shell that consumes the identity APIs an
 
 **Implementation Steps:**
 
-1. Add frontend API helpers for `/auth/register`, `/auth/login`, `/auth/refresh`, and `/me`.
+1. Add frontend API helpers for `/api/v1/identity/register`, `/api/v1/identity/login`, `/api/v1/identity/refresh`, and `/api/v1/identity/me`.
 2. Create auth state and current-user bootstrap behavior.
 3. Build register and login screens with backend error rendering.
 4. Add signed-in vs signed-out header logic.
@@ -864,11 +864,25 @@ Expose stable post-purchase screens so the buyer can review successful orders in
 
 `task 1.7: confirm paid checkouts into orders`
 
+### Program 1 Continuation Tasks
+
+Program 1 continues beyond `Task 1.7`. The detailed execution definitions for the remaining
+Phase 1 tasks live in the dedicated Phase 1 plan and the task dashboard, but the canonical
+task sequence is:
+
+- `Task 1.8`: seller-application submission baseline
+- `Task 1.9`: audit and outbox persistence baseline
+- `Task 1.10`: API contract and error-envelope alignment
+- `Task 1.11`: operational baseline hardening and docs alignment
+- `Task 1.12`: final Phase 1 verification and cleanup
+
+Program 2 starts only after those Phase 1 tasks are complete.
+
 ## 7. Program 2: Marketplace Governance
 
-### Task 2.1: Implement Seller Application Workflow
+### Task 2.1: Implement Seller Onboarding Lifecycle
 
-**Objective:** Allow buyers to become sellers through explicit approval.
+**Objective:** Expand the Phase 1 seller-application baseline into a governed seller lifecycle.
 
 **Files:**
 
@@ -880,26 +894,27 @@ Expose stable post-purchase screens so the buyer can review successful orders in
 
 **Capabilities:**
 
-- submit application
-- view own application state
+- create governed seller profile after approval
+- manage seller status transitions
+- expose approval-driven seller capability boundaries
 
 **Steps:**
 
-1. Model `SellerProfile` and `SellerApplication`.
-2. Restrict application submission to authenticated users.
-3. Prevent duplicate active applications.
-4. Expose seller application endpoint.
+1. Build on the existing `SellerApplication` baseline from Program 1.
+2. Create seller profile records after approval or equivalent onboarding transition.
+3. Define seller status transitions such as `PENDING`, `APPROVED`, `REJECTED`, and `SUSPENDED`.
+4. Ensure seller-facing capabilities are blocked until approval is complete.
 
 **Verification:**
 
-- Duplicate application tests
-- Auth boundary tests
+- seller lifecycle transition tests
+- seller capability boundary tests
 
 **Frontend Companion Task 2.1-FE**
 
 **Objective:**
 
-Expose seller-application submission and status tracking inside the buyer account area.
+Extend the buyer account experience from seller-application tracking into seller-onboarding state visibility.
 
 **Files:**
 
@@ -909,29 +924,29 @@ Expose seller-application submission and status tracking inside the buyer accoun
 
 **Required Features:**
 
-- seller application form
-- seller application status screen
-- pending, approved, and rejected states
+- seller onboarding state screen
+- approved, rejected, and suspended states
+- continuity from the existing Phase 1 application flow
 
 **Implementation Steps:**
 
-1. Add API integration for seller application submission and status lookup.
-2. Add seller-application entry point in the account area.
-3. Build seller application form and status screens.
-4. Render pending, approved, and rejected states clearly.
+1. Reuse the Phase 1 seller-application screens as the starting point.
+2. Add state handling for approved, rejected, and suspended outcomes.
+3. Ensure buyer account screens reflect the governed seller lifecycle correctly.
+4. Keep admin decision UI out of buyer-facing scope.
 
 **Verification:**
 
-- buyer can submit application through the UI
-- status updates reflect backend state correctly
+- buyer-facing account UI reflects governed seller status correctly
+- no admin-only controls appear in the buyer web
 
 **Suggested Frontend Commit Message:**
 
-`task 2.1.2: add seller application screens in buyer account area`
+`task 2.1.2: extend buyer account seller onboarding states`
 
 **Commit Message:**
 
-`task 2.1: add seller application workflow`
+`task 2.1: implement seller onboarding lifecycle`
 
 ### Task 2.2: Implement Admin Seller Decision Flow
 
@@ -1598,21 +1613,26 @@ Then verify manually:
 11. `task 1.5: implement checkout sessions with stock reservation`
 12. `task 1.6: implement payment request and webhook confirmation`
 13. `task 1.7: confirm paid checkouts into orders`
-14. `task 2.1: add seller application workflow`
-15. `task 2.2: implement seller approval and suspension controls`
-16. `task 2.3: add seller product draft and review submission flows`
-17. `task 2.4: implement product moderation workflow`
-18. `task 2.5: add seller inventory management endpoints`
-19. `task 3.1: add audit trail for privileged and financial actions`
-20. `task 3.2: persist cross-module events through outbox`
-21. `task 3.3: implement refund request and state handling`
-22. `task 3.4: add payment reconciliation hooks and mismatch detection`
-23. `task 3.5: add support operations inspection and override tools`
-24. `task 4.1: add notification integration boundary`
-25. `task 4.2: add metrics and observability baseline`
-26. `task 4.3: add rate limiting for critical endpoints`
-27. `task 4.4: add reference seed data for local review`
-28. `task 4.5: align operational and api documentation with implementation`
+14. `task 1.8: add seller application submission workflow`
+15. `task 1.9: add audit trail and outbox persistence foundation`
+16. `task 1.10: align phase 1 api contract and error conventions`
+17. `task 1.11: add phase 1 operational baseline hardening`
+18. `task 1.12: finalize phase 1 verification and cleanup`
+19. `task 2.1: implement seller onboarding lifecycle`
+20. `task 2.2: implement seller approval and suspension controls`
+21. `task 2.3: add seller product draft and review submission flows`
+22. `task 2.4: implement product moderation workflow`
+23. `task 2.5: add seller inventory management endpoints`
+24. `task 3.1: add audit trail for privileged and financial actions`
+25. `task 3.2: persist cross-module events through outbox`
+26. `task 3.3: implement refund request and state handling`
+27. `task 3.4: add payment reconciliation hooks and mismatch detection`
+28. `task 3.5: add support operations inspection and override tools`
+29. `task 4.1: add notification integration boundary`
+30. `task 4.2: add metrics and observability baseline`
+31. `task 4.3: add rate limiting for critical endpoints`
+32. `task 4.4: add reference seed data for local review`
+33. `task 4.5: align operational and api documentation with implementation`
 
 ## 14. What Is Intentionally Deferred Beyond This Plan
 

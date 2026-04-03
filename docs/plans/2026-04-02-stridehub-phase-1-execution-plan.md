@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Build a production-style, Phase 1 backend foundation for StrideHub that supports authentication, catalog, variant inventory, cart, checkout, payment callback handling, order confirmation, and seller approval in a modular monolith.
+**Goal:** Build a production-style, Phase 1 backend foundation for StrideHub that supports authentication, catalog, variant inventory, cart, checkout, payment callback handling, order confirmation, seller application submission, and audit/outbox baseline integrity in a modular monolith.
 
 **Architecture:** The implementation uses a modular monolith with explicit package boundaries for identity, catalog, inventory, cart, checkout, payment, orders, sellers, admin, and shared infrastructure. PostgreSQL is the system of record, Redis is used only for ephemeral and performance-sensitive concerns, and payment is integrated behind a provider abstraction with webhook-driven confirmation.
 
@@ -147,7 +147,7 @@ Use the pattern:
 3. Implement JWT generation and validation.
 4. Implement login with password verification.
 5. Implement refresh token rotation and revocation.
-6. Expose `/auth/register`, `/auth/login`, `/auth/refresh`, `/me`.
+6. Expose `/api/v1/identity/register`, `/api/v1/identity/login`, `/api/v1/identity/refresh`, and `/api/v1/identity/me`.
 
 **Verification:**
 
@@ -180,7 +180,7 @@ Deliver the buyer-facing authentication shell that can register, log in, bootstr
 
 **Implementation Steps:**
 
-1. Create frontend request helpers for `/auth/register`, `/auth/login`, `/auth/refresh`, and `/me`.
+1. Create frontend request helpers for `/api/v1/identity/register`, `/api/v1/identity/login`, `/api/v1/identity/refresh`, and `/api/v1/identity/me`.
 2. Add auth state storage strategy suitable for the current frontend shell.
 3. Build register and login forms with backend error rendering.
 4. Load current user state on app bootstrap or route entry.
@@ -659,7 +659,7 @@ Add buyer post-purchase screens so a confirmed order is visible as a stable comm
 
 ## Task 1.8: Implement Seller Application Workflow
 
-**Objective:** Add marketplace governance without full seller tooling yet.
+**Objective:** Add the seller-application submission baseline without moving seller approval into Phase 1.
 
 **Files:**
 
@@ -667,28 +667,27 @@ Add buyer post-purchase screens so a confirmed order is visible as a stable comm
 - Create: `backend/src/main/java/com/stridehub/seller/application/...`
 - Create: `backend/src/main/java/com/stridehub/seller/infrastructure/...`
 - Create: `backend/src/main/java/com/stridehub/seller/web/SellerApplicationController.java`
-- Create: `backend/src/main/java/com/stridehub/admin/web/AdminSellerController.java`
 - Create: `backend/src/test/java/com/stridehub/seller/...`
 
 **Required Features:**
 
 - submit seller application
-- admin approve seller
-- admin reject seller
-- reflect role/state changes
+- view current application state
+- prevent duplicate active applications
+- persist baseline records needed for later admin review
 
 **Implementation Steps:**
 
-1. Implement `SellerApplication` and `SellerProfile`.
+1. Implement `SellerApplication` and the minimum `SellerProfile` baseline entities required for later lifecycle work.
 2. Restrict seller application submission to authenticated users.
-3. Restrict approval endpoints to admins.
-4. Record approval decision reason.
-5. Update role assignment or seller status on approval.
+3. Prevent duplicate active applications for the same user.
+4. Expose the current-user seller-application status endpoint.
+5. Defer admin decision endpoints and seller approval transitions to Program 2.
 
 **Verification:**
 
-- tests for buyer cannot call admin endpoints
-- tests for approval changing seller state
+- tests for authenticated submission and current-status lookup
+- tests for duplicate prevention and unauthenticated rejection
 
 **Frontend Companion Task 1.8-FE**
 
@@ -728,7 +727,7 @@ Expose the seller-application experience inside the buyer account area without e
 
 **Commit Message:**
 
-`task 1.8: implement seller application and approval workflow`
+`task 1.8: add seller application submission workflow`
 
 ## Task 1.9: Implement Audit and Outbox Foundation
 
@@ -752,7 +751,7 @@ Expose the seller-application experience inside the buyer account area without e
 
 1. Create `AuditLog` and `OutboxEvent` persistence model.
 2. Persist audit records for:
-   - seller approval
+   - seller application submission
    - payment webhook processing
    - order confirmation
 3. Add outbox records for payment confirmed and order created events.
@@ -760,7 +759,7 @@ Expose the seller-application experience inside the buyer account area without e
 
 **Verification:**
 
-- integration tests showing audit rows are written for admin approval and order confirmation
+- integration tests showing audit rows are written for seller application submission, payment processing, and order confirmation
 
 **Frontend Companion Task 1.9-FE**
 
@@ -868,12 +867,12 @@ Eliminate contract drift between frontend integrations and the documented Phase 
 - Modify: `docs/test-strategy.md`
 - Modify: `docs/release-checklist.md`
 - Modify: `docs/runbooks/*`
-- Create: `.github/workflows/build.yml`
+- Modify: `.github/workflows/build.yml` only if CI no longer reflects the actual baseline
 
 **Implementation Steps:**
 
 1. Update root README with setup and run instructions.
-2. Add a minimal CI workflow for compile and test.
+2. Review the existing CI workflow and keep it aligned with the actual backend and frontend verification commands.
 3. Confirm local startup and test instructions reflect the actual implementation.
 4. Refine runbooks if implementation details changed from the original design assumptions.
 
@@ -944,7 +943,7 @@ Make the frontend workspace runnable, documented, and reviewable as part of the 
    - create checkout session
    - simulate payment success webhook
    - read order detail
-5. Confirm audit logs exist for the approval and payment path.
+5. Confirm audit logs exist for the seller-application, payment, and order-confirmation paths.
 6. Confirm duplicate webhook replay does not duplicate order creation.
 7. Run buyer-web smoke flow against the completed Phase 1 backend:
    - register or login
@@ -980,7 +979,7 @@ The plan is complete only when all of the following are true:
 - payment initiation exists behind a provider abstraction
 - signed webhook processing is idempotent
 - successful payment confirms an order exactly once
-- seller application and admin approval work
+- seller application submission and current-status lookup work
 - audit records exist for privileged and finance-sensitive flows
 - OpenAPI, README, and runbooks reflect the implemented behavior
 - buyer frontend integrates with the completed Phase 1 backend milestones without relying on stale mocks
