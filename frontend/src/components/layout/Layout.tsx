@@ -1,5 +1,6 @@
 import React from 'react';
 import Header from './Header';
+import CartDrawer from '../../features/cart/CartDrawer';
 import './Layout.css';
 
 interface LayoutProps {
@@ -10,6 +11,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="layout-root">
       <Header />
+      <CartDrawer />
       <main className="main-content">
         {children}
       </main>
@@ -23,3 +25,4 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 };
 
 export default Layout;
+

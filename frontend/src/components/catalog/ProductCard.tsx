@@ -1,5 +1,6 @@
 import React from 'react';
 import Badge from '../common/Badge';
+import { useCart } from '../../context/CartContext';
 import './ProductCard.css';
 
 interface ProductCardProps {
@@ -21,8 +22,15 @@ const ProductCard: React.FC<ProductCardProps> = ({
   stock, 
   isNew 
 }) => {
+  const { addItem } = useCart();
   const isOutOfStock = stock === 0;
   const isLowStock = stock > 0 && stock <= 5;
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem({ id, name, price, image, quantity: 1 });
+  };
 
   return (
     <div className={`product-card ${isOutOfStock ? 'product-card--out-of-stock' : ''}`} data-product-id={id}>
@@ -39,7 +47,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* Quick Add (Visible on Hover in Vessi) */}
         {!isOutOfStock && (
           <div className="product-card__quick-add">
-            <button className="btn btn-primary btn-sm">Add to Cart</button>
+            <button className="btn btn-primary btn-sm" onClick={handleAddToCart}>
+              Add to Cart
+            </button>
           </div>
         )}
       </div>
@@ -66,3 +76,4 @@ const ProductCard: React.FC<ProductCardProps> = ({
 };
 
 export default ProductCard;
+

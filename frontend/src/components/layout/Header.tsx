@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, Search, User, Globe, Menu } from 'lucide-react';
+import { useCart } from '../../context/CartContext';
 import './Header.css';
 
 const announcements = [
@@ -14,6 +15,7 @@ const Header: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const [announcementIndex, setAnnouncementIndex] = useState(0);
+  const { totalItems, setIsCartOpen } = useCart();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -25,7 +27,8 @@ const Header: React.FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      setIsScrolled(currentScrollY > 50);
+      setIsScrolled(currentScrollY > 10);
+      
       if (currentScrollY > lastScrollY && currentScrollY > 400) {
         setIsVisible(false);
       } else {
@@ -70,12 +73,16 @@ const Header: React.FC = () => {
             <button aria-label="Search" className="icon-btn">
               <Search size={18} />
             </button>
-            <Link to="/login" aria-label="Account" className="icon-btn">
+            <Link to="/auth/login" aria-label="Account" className="icon-btn">
               <User size={18} />
             </Link>
-            <button aria-label="Shopping bag" className="icon-btn cart-btn">
+            <button 
+              aria-label="Shopping bag" 
+              className="icon-btn cart-btn"
+              onClick={() => setIsCartOpen(true)}
+            >
               <ShoppingBag size={18} />
-              <span className="cart-count">0</span>
+              {totalItems > 0 && <span className="cart-count">{totalItems}</span>}
             </button>
             <button className="mobile-menu-btn" aria-label="Menu">
               <Menu size={24} />
@@ -88,3 +95,4 @@ const Header: React.FC = () => {
 };
 
 export default Header;
+
