@@ -17,8 +17,8 @@ For implementation detail, use these source documents:
 
 ## Current Execution Position
 
-- Current repository baseline: `Program 0 complete, Program 1 through Task 1.9 in progress`
-- Current recommended next task: `Task 1.10`
+- Current repository baseline: `Program 0 complete, Program 1 complete through Task 1.12`
+- Current recommended next task: `Task 2.1`
 - Current execution mode: `follow numbered tasks in order`
 
 ## Phase Summary
@@ -26,7 +26,7 @@ For implementation detail, use these source documents:
 | Program | Phase Name | Scope | Status | Next Gate |
 | --- | --- | --- | --- | --- |
 | 0 | Engineering Foundation | monorepo, backend baseline, frontend shell, CI, docs alignment | `[x]` | Start `Task 1.1` |
-| 1 | Commerce Core | identity, catalog, inventory, cart, checkout, payment, order, seller application, audit/outbox baseline | `[-]` | Continue from `Task 1.7` through `1.12` |
+| 1 | Commerce Core | identity, catalog, inventory, cart, checkout, payment, order, seller application, audit/outbox baseline | `[x]` | Start `Task 2.1` |
 | 2 | Marketplace Governance | seller lifecycle, admin seller decisions, seller products, moderation, seller inventory | `[ ]` | Start only after Phase 1 exit criteria passes |
 | 3 | Financial and Operational Integrity | audit hardening, outbox dispatch, refunds, reconciliation, support tooling | `[ ]` | Start only after payment and order flows are stable |
 | 4 | Scale and Production Readiness | notifications, observability, abuse controls, demo fixtures, production docs alignment | `[ ]` | Start only after Programs 1 to 3 are complete |
@@ -50,9 +50,9 @@ For implementation detail, use these source documents:
 | 1 | 1.7 | Implement Order Module | `backend/order` | `[x]` | `1.5`, `1.6` | order creation from payment-confirmed checkout, state machine, buyer order access | order confirmation, order history, order detail pages | order lifecycle tests + duplicate confirm tests | `task 1.7` |
 | 1 | 1.8 | Implement Seller Application Workflow | `backend/seller` | `[x]` | `1.1` | seller application submission baseline | seller application form and status view in account area | seller application tests | `task 1.8` |
 | 1 | 1.9 | Implement Audit and Outbox Foundation | `backend/audit` + shared persistence | `[x]` | `1.6`, `1.7`, `1.8` | initial audit log and outbox persistence for critical transitions | expose only safe status breadcrumbs; no major new page | audit/outbox persistence tests | `task 1.9` |
-| 1 | 1.10 | Tighten API Documentation and Error Contract | `docs/` + backend web layer | `[ ]` | `1.1` to `1.9` | OpenAPI, path/versioning, error-envelope alignment | remove stale mocks and sync FE request/response types | docs review against implementation | `task 1.10` |
-| 1 | 1.11 | Add Operational Baseline | root + `backend/` + `frontend/` + docs | `[ ]` | `1.1` to `1.10` | local run hardening, fixtures, health visibility, startup guidance | verify FE env, startup, and build docs/scripts | local run-through + docs checks | `task 1.11` |
-| 1 | 1.12 | Final Phase 1 Verification and Cleanup | monorepo-wide | `[ ]` | `1.1` to `1.11` | clean, stable Phase 1 baseline | run end-to-end buyer smoke flow against real APIs | backend test + compile + frontend lint/test/build + docs review | `task 1.12` |
+| 1 | 1.10 | Tighten API Documentation and Error Contract | `docs/` + backend web layer | `[x]` | `1.1` to `1.9` | OpenAPI, path/versioning, error-envelope alignment | remove stale mocks and sync FE request/response types | docs review against implementation | `task 1.10` |
+| 1 | 1.11 | Add Operational Baseline | root + `backend/` + `frontend/` + docs | `[x]` | `1.1` to `1.10` | local run hardening, fixtures, health visibility, startup guidance | verify FE env, startup, and build docs/scripts | local run-through + docs checks | `task 1.11` |
+| 1 | 1.12 | Final Phase 1 Verification and Cleanup | monorepo-wide | `[x]` | `1.1` to `1.11` | clean, stable Phase 1 baseline | run end-to-end buyer smoke flow against real APIs | backend test + compile + frontend lint/test/build + docs review | `task 1.12` |
 | 2 | 2.1 | Implement Seller Onboarding Lifecycle | `backend/seller` | `[ ]` | `1.8`, `1.9` | seller profile creation and lifecycle states after review | seller status reflection in buyer/account UI | seller lifecycle tests | `task 2.1` |
 | 2 | 2.2 | Implement Admin Seller Decision Flow | `backend/admin`, `backend/seller` | `[ ]` | `2.1` | admin approve, reject, suspend, reactivate seller flow | buyer-facing state updates only; admin UI can stay deferred | admin RBAC tests + status transition tests | `task 2.2` |
 | 2 | 2.3 | Implement Seller Product Management | `backend/seller`, `backend/catalog` | `[ ]` | `2.1`, `2.2` | seller-owned product CRUD and draft/review lifecycle | seller portal deferred unless internal FE track starts | ownership tests + seller product API tests | `task 2.3` |
@@ -83,6 +83,6 @@ For implementation detail, use these source documents:
 
 | Priority | Action | Why |
 | --- | --- | --- |
-| 1 | Reconcile OpenAPI and path/versioning during `Task 1.10` | documentation still trails the implemented Phase 1 contract |
-| 2 | Finish `Task 1.11` and `1.12` with full verification | closes the operational and documentation gates for Phase 1 |
-| 3 | Review docs claims against actual seller/audit baseline | prevents Phase 1 docs from overstating governance scope |
+| 1 | Start `Task 2.1` seller onboarding lifecycle | Phase 1 exit criteria are now satisfied |
+| 2 | Decide whether Phase 2 needs an internal seller/admin UI track now or later | backend governance work can proceed independently, but UI sequencing should be explicit |
+| 3 | Keep Phase 1 verification green while opening Phase 2 work | prevents governance changes from regressing the buyer commerce baseline |

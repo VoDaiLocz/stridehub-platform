@@ -30,9 +30,9 @@ This file is the day-to-day execution checklist for the repository. It is meant 
 - [x] Monorepo structure exists with `backend/` and `frontend/`.
 - [x] Program 0 foundation is complete.
 - [x] Backend compile and test baseline already runs.
-- [x] Frontend buyer shell is scaffolded.
-- [-] Commerce core implementation is in progress through audit and outbox foundation.
-- [-] Current recommended next task: `Task 1.10`.
+- [x] Frontend buyer companion baseline exists for auth, catalog, cart, checkout, and buyer order pages.
+- [x] Program 1 commerce core is implemented through Task `1.12`.
+- [x] Current recommended next task: `Task 2.1`.
 
 ## Task Execution Workflow
 
@@ -55,6 +55,7 @@ Use this mini-checklist for every numbered task before moving to the next one.
 .\backend\mvnw.cmd test
 .\backend\mvnw.cmd -q -DskipTests compile
 pnpm --dir frontend lint
+pnpm --dir frontend test --run
 pnpm --dir frontend build
 git status --short --branch
 ```
@@ -126,17 +127,17 @@ These tasks are already complete in the current repository history.
 - [x] Backend foundation is stable enough for business module work.
 - [x] Frontend workspace exists for later buyer UI development.
 - [x] CI, docs, and monorepo layout are aligned.
-- [x] The next task is clearly defined as `Task 1.1`.
+- [x] The next task was clearly defined as `Task 1.1`.
 
 ## Program 1 / Phase 1: Commerce Core
 
-This is the current implementation phase. Use the detailed Phase 1 plan as the day-to-day source of truth.
+This phase is complete in the current repository history. Keep it as the completion ledger for the shipped Phase 1 baseline.
 
 ### Phase 1 Entry Gate
 
 - [x] Program 0 is complete.
-- [ ] API versioning and route prefix are finalized consistently before exposing new business endpoints.
-- [ ] OpenAPI identity contract includes `/auth/register`, `/auth/login`, `/auth/refresh`, and `/me` in the same style used by implementation.
+- [x] API versioning and route prefix are finalized consistently before exposing new business endpoints.
+- [x] OpenAPI identity contract includes `/auth/register`, `/auth/login`, `/auth/refresh`, and `/me` in the same style used by implementation.
 
 ### Task 1.1: Implement Identity Domain and Security Model
 
@@ -152,7 +153,7 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - [x] Implement refresh-token rotation endpoint.
 - [x] Implement current user endpoint.
 - [x] Add integration tests for register, login, refresh, and protected `/me`.
-- [ ] Update OpenAPI and auth docs to match the implemented endpoint shape.
+- [x] Update OpenAPI and auth docs to match the implemented endpoint shape.
 - [x] Commit as `task 1.1: implement authentication and rbac foundation`.
 
 ### Task 1.2: Implement Catalog Module
@@ -167,7 +168,7 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - [x] Ensure only `ACTIVE` products are exposed publicly.
 - [x] Add test fixtures or seed strategy for catalog scenarios.
 - [x] Add API tests for product listing and detail.
-- [ ] Update OpenAPI catalog paths and examples.
+- [x] Update OpenAPI catalog paths and examples.
 - [x] Commit as `task 1.2: add catalog browsing and product detail endpoints`.
 
 ### Task 1.3: Implement Inventory Module
@@ -195,7 +196,7 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - [x] Validate variant existence and basic availability before accepting line items.
 - [x] Keep stored cart pricing revalidatable rather than final.
 - [x] Add tests for cart mutation and validation behavior.
-- [ ] Update OpenAPI cart contract.
+- [x] Update OpenAPI cart contract.
 - [x] Commit as `task 1.4: add buyer cart management flow`.
 
 ### Task 1.5: Implement Checkout Session Module
@@ -207,10 +208,10 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - [x] Snapshot buyer address, shipping, and pricing inputs needed for checkout.
 - [x] Revalidate price and stock at checkout start.
 - [x] Create inventory reservations for selected items.
-- [ ] Support cancel or timeout path that releases reservations.
+- [x] Support cancel or timeout path that releases reservations.
 - [x] Add tests for stale cart data and reservation failure.
-- [ ] Update OpenAPI checkout contract.
-- [ ] Commit as `task 1.5: add checkout session and validation flow`.
+- [x] Update OpenAPI checkout contract.
+- [x] Commit as `task 1.5: add checkout session and validation flow`.
 
 ### Task 1.6: Implement Payment Module with Provider Abstraction
 
@@ -224,8 +225,8 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - [x] Make webhook processing idempotent.
 - [x] Ensure webhook does not create duplicate confirmations.
 - [x] Add tests for duplicate callback behavior and signature validation.
-- [ ] Update OpenAPI payment and webhook contract.
-- [ ] Commit as `task 1.6: implement payment provider abstraction and webhook flow`.
+- [x] Update OpenAPI payment and webhook contract.
+- [x] Commit as `task 1.6: implement payment provider abstraction and webhook flow`.
 
 ### Task 1.7: Implement Order Module
 
@@ -238,7 +239,7 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - [x] Commit inventory reservations only after payment success.
 - [x] Support buyer order detail and order listing access.
 - [x] Add tests for payment-confirmed order creation and duplicate webhook safety.
-- [ ] Update OpenAPI orders contract.
+- [x] Update OpenAPI orders contract.
 - [x] Commit as `task 1.7: implement order creation and lifecycle state machine`.
 
 ### Task 1.8: Implement Seller Application Workflow
@@ -251,7 +252,7 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - [x] Validate seller application payload and prevent duplicate active applications.
 - [x] Prepare admin review path hooks for later tasks through baseline entities and repositories.
 - [x] Add tests for submit and duplicate prevention.
-- [ ] Update OpenAPI seller application contract.
+- [x] Update OpenAPI seller application contract.
 - [x] Commit as `task 1.8: add seller application submission workflow`.
 
 ### Task 1.9: Implement Audit and Outbox Foundation
@@ -263,51 +264,51 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - [x] Capture privileged actor and reason where applicable.
 - [x] Record key domain events for payment, order, and seller-application transitions.
 - [x] Add tests that audit and outbox entries are persisted on critical transitions.
-- [ ] Update architecture and operations docs if event publishing behavior changes.
+- [x] Update architecture and operations docs if event publishing behavior changes.
 - [x] Commit as `task 1.9: add audit trail and outbox persistence foundation`.
 
 ### Task 1.10: Tighten API Documentation and Error Contract
 
 **Goal:** align runtime behavior, OpenAPI contract, and shared error envelope.
 
-- [ ] Review all Phase 1 endpoints for path consistency.
-- [ ] Ensure API versioning is documented consistently.
-- [ ] Align OpenAPI schemas with implemented request and response DTOs.
-- [ ] Align authentication requirements in OpenAPI security sections.
-- [ ] Ensure error payload examples match actual backend behavior.
-- [ ] Commit as `task 1.10: align phase 1 api contract and error conventions`.
+- [x] Review all Phase 1 endpoints for path consistency.
+- [x] Ensure API versioning is documented consistently.
+- [x] Align OpenAPI schemas with implemented request and response DTOs.
+- [x] Align authentication requirements in OpenAPI security sections.
+- [x] Ensure error payload examples match actual backend behavior.
+- [x] Commit as `task 1.10: align phase 1 api contract and error conventions`.
 
 ### Task 1.11: Add Operational Baseline
 
 **Goal:** make the Phase 1 system easier to run, inspect, and debug locally.
 
-- [ ] Add any missing local seeds or demo fixtures required for manual verification.
-- [ ] Improve actuator, health, and local visibility where needed.
-- [ ] Confirm Docker Compose services are sufficient for local Phase 1 flows.
-- [ ] Ensure backend and frontend startup instructions remain correct.
-- [ ] Update relevant docs and runbooks for the implemented baseline.
-- [ ] Commit as `task 1.11: add phase 1 operational baseline hardening`.
+- [x] Add any missing local seeds or demo fixtures required for manual verification.
+- [x] Improve actuator, health, and local visibility where needed.
+- [x] Confirm Docker Compose services are sufficient for local Phase 1 flows.
+- [x] Ensure backend and frontend startup instructions remain correct.
+- [x] Update relevant docs and runbooks for the implemented baseline.
+- [x] Commit as `task 1.11: add phase 1 operational baseline hardening`.
 
 ### Task 1.12: Final Phase 1 Verification and Cleanup
 
 **Goal:** close Phase 1 with a stable, reviewable, and documented baseline.
 
-- [ ] Run full backend test suite.
-- [ ] Run backend compile verification.
-- [ ] Run frontend lint and build verification.
-- [ ] Remove dead code, unused properties, and stale placeholders that no longer match the baseline.
-- [ ] Confirm docs do not claim more than what has actually been implemented.
-- [ ] Confirm task status in this file is accurate.
+- [x] Run full backend test suite.
+- [x] Run backend compile verification.
+- [x] Run frontend lint, test, and build verification.
+- [x] Remove dead code, unused properties, and stale placeholders that no longer match the baseline.
+- [x] Confirm docs do not claim more than what has actually been implemented.
+- [x] Confirm task status in this file is accurate.
 - [ ] Commit as `task 1.12: finalize phase 1 verification and cleanup`.
 
 ### Phase 1 Exit Checklist
 
-- [ ] Identity, catalog, inventory, cart, checkout, payment, and order flow are implemented.
-- [ ] Seller application exists.
-- [ ] Audit and outbox foundation exist.
-- [ ] OpenAPI and runtime behavior are aligned.
-- [ ] Phase 1 verification commands pass.
-- [ ] Phase 1 docs are aligned with actual implementation.
+- [x] Identity, catalog, inventory, cart, checkout, payment, and order flow are implemented.
+- [x] Seller application exists.
+- [x] Audit and outbox foundation exist.
+- [x] OpenAPI and runtime behavior are aligned.
+- [x] Phase 1 verification commands pass.
+- [x] Phase 1 docs are aligned with actual implementation.
 
 ## Program 2 / Phase 2: Marketplace Governance
 
@@ -479,17 +480,23 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 
 ## Final Completion Checklist
 
-- [ ] All tasks marked complete reflect reality in the codebase.
-- [ ] OpenAPI matches implemented endpoints.
-- [ ] Backend tests and compile checks pass.
-- [ ] Frontend lint and build checks pass.
-- [ ] Docs do not overstate implementation status.
-- [ ] Commit history remains traceable to numbered tasks.
+- [x] All tasks marked complete reflect reality in the codebase.
+- [x] OpenAPI matches implemented endpoints.
+- [x] Backend tests and compile checks pass.
+- [x] Frontend lint, test, and build checks pass.
+- [x] Docs do not overstate implementation status.
+- [x] Commit history remains traceable to numbered tasks.
 
 ## Execution Log
 
+- `2026-04-03 22:55 +07:00` Frontend companion milestones were recorded as `task 1.1.2`, `1.2.2`, `1.3.2`, `1.4.2`, `1.5.2`, and `1.7.2` for auth, catalog shell, inventory-aware product cards, cart UX, checkout screen, and buyer order success UX.
 - `2026-04-04 00:54 +07:00` Task `1.5` verified locally with `.\mvnw.cmd test` (`63` tests, `0` failures) and `.\mvnw.cmd -q -DskipTests compile` before commit.
+- `2026-04-04 01:05 +07:00` Task `1.5.1` added checkout expiry scheduling and reservation release handling before payment follow-up wiring.
 - `2026-04-04 01:13 +07:00` Task `1.6` verified locally with `.\mvnw.cmd test` (`67` tests, `0` failures), `.\mvnw.cmd -q -DskipTests compile`, and payment-focused test coverage before commit.
 - `2026-04-04 01:30 +07:00` Task `1.7` verified locally with `.\mvnw.cmd -Dtest=OrderControllerIntegrationTest test`, `.\mvnw.cmd test` (`69` tests, `0` failures), and `.\mvnw.cmd -q -DskipTests compile` before commit.
+- `2026-04-04 03:15 +07:00` Task `1.7.3` completed the buyer Phase 1 companion baseline with protected buyer orders, collection routes, product detail, typed API clients, and stronger session/cart contexts.
 - `2026-04-04 01:39 +07:00` Task `1.8` verified locally with `.\mvnw.cmd -Dtest=SellerApplicationControllerIntegrationTest test` and `.\mvnw.cmd -q -DskipTests compile` before commit.
 - `2026-04-04 01:50 +07:00` Task `1.9` verified locally with `.\mvnw.cmd -Dtest=AuditOutboxIntegrationTest test`, `.\mvnw.cmd test` (`75` tests, `0` failures), and `.\mvnw.cmd -q -DskipTests compile` before commit.
+- `2026-04-04 03:28 +07:00` Task `1.10` aligned OpenAPI, runtime route prefixes, and shared error-envelope expectations, including contract coverage for `/v3/api-docs`.
+- `2026-04-04 03:31 +07:00` Task `1.11` finalized Phase 1 operational baseline with local seed data, updated startup guidance, and baseline runbook/test-strategy alignment.
+- `2026-04-04 03:42 +07:00` Phase 1 final verification passed with backend tests (`78` tests, `0` failures), backend compile, frontend lint, frontend tests (`5` passing), and frontend production build.
