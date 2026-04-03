@@ -1,0 +1,136 @@
+.checkout-summary {
+  width: 100%;
+}
+
+.urgency-timer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: #fff4f4;
+  color: #d0021b;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  margin-bottom: 28px;
+}
+
+.timer-icon {
+  animation: timer-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes timer-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.92); }
+}
+
+.summary-items {
+  margin-bottom: 36px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.summary-items::-webkit-scrollbar {
+  width: 4px;
+}
+
+.summary-items::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 10px;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.item-image-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+}
+
+.item-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.item-qty-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: #666;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  width: 22px;
+  height: 22px;
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  z-index: 1;
+}
+
+.item-details {
+  flex: 1;
+}
+
+.item-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.item-variant {
+  font-size: 0.8rem;
+  color: #8e8e93;
+  margin-top: 4px;
+}
+
+.item-price {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.summary-calculations {
+  border-top: 1px solid #e5e5e5;
+  padding-top: 28px;
+}
+
+.calc-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  font-size: 0.95rem;
+  color: #555;
+  font-weight: 400;
+}
+
+.total-row {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e5e5;
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.total-row span:first-child {
+  font-size: 1.1rem;
+}
+
+.total-price {
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}

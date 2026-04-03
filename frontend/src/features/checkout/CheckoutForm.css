@@ -1,0 +1,147 @@
+.checkout-form {
+  padding-right: 20px;
+}
+
+.checkout-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.breadcrumb-item.active {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.breadcrumb-item-link {
+  color: var(--primary-main);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.breadcrumb-separator {
+  color: #ddd;
+}
+
+.form-section {
+  margin-bottom: 56px;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  margin-bottom: 24px;
+  font-weight: 600;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.section-subtitle {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px 18px;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background-color: white;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #000;
+  box-shadow: 0 0 0 1px #000;
+}
+
+.form-input::placeholder {
+  color: #999;
+}
+
+.form-input:disabled {
+  background-color: #f7f7f7;
+  color: #aaa;
+  cursor: not-allowed;
+  border-color: #eee;
+}
+
+.payment-placeholder {
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 32px;
+  background-color: #fafafa;
+}
+
+.credit-card-shell {
+  opacity: 0.7;
+}
+
+.payment-note {
+  font-size: 0.8rem;
+  color: #999;
+  margin-top: 24px;
+  text-align: center;
+  font-style: italic;
+}
+
+.checkout-button {
+  width: 100%;
+  padding: 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-top: 40px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background-color: #000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.checkout-button:hover:not(:disabled) {
+  background-color: #333;
+  transform: translateY(-2px);
+}
+
+.checkout-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+  .checkout-form {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+  }
+}

@@ -1,14 +1,21 @@
 import React from 'react';
 import { useCart } from '../../context/CartContext';
+import { useNavigate } from 'react-router-dom';
 import './CartDrawer.css';
 
 const CartDrawer: React.FC = () => {
   const { items, removeItem, updateQuantity, subtotal, isCartOpen, setIsCartOpen } = useCart();
+  const navigate = useNavigate();
   const freeShippingThreshold = 120;
   const deliveryProgress = Math.min((subtotal / freeShippingThreshold) * 100, 100);
   const remainingForFreeShipping = freeShippingThreshold - subtotal;
 
   if (!isCartOpen) return null;
+
+  const handleCheckout = () => {
+    setIsCartOpen(false);
+    navigate('/checkout');
+  };
 
   return (
     <div className={`cart-overlay ${isCartOpen ? 'cart-overlay--open' : ''}`} onClick={() => setIsCartOpen(false)}>
@@ -72,7 +79,7 @@ const CartDrawer: React.FC = () => {
                 <span>{remainingForFreeShipping > 0 ? "Calculated at checkout" : "FREE"}</span>
               </div>
             </div>
-            <button className="btn btn-primary btn-block checkout-btn">
+            <button className="btn btn-primary btn-block checkout-btn" onClick={handleCheckout}>
               Checkout — ${subtotal.toFixed(2)}
             </button>
           </div>
