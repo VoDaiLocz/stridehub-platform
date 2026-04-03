@@ -9,6 +9,7 @@ import com.stridehub.common.exception.ConflictException;
 import com.stridehub.common.exception.NotFoundException;
 import com.stridehub.common.time.TimeProvider;
 import com.stridehub.config.StridehubProperties;
+import com.stridehub.order.application.OrderService;
 import com.stridehub.payment.domain.Payment;
 import com.stridehub.payment.domain.PaymentAttempt;
 import com.stridehub.payment.domain.PaymentStatus;
@@ -32,6 +33,7 @@ public class PaymentService {
     private final PaymentProvider paymentProvider;
     private final StridehubProperties stridehubProperties;
     private final TimeProvider timeProvider;
+    private final OrderService orderService;
     private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     public PaymentService(
@@ -40,7 +42,8 @@ public class PaymentService {
             PaymentAttemptRepository paymentAttemptRepository,
             PaymentProvider paymentProvider,
             StridehubProperties stridehubProperties,
-            TimeProvider timeProvider
+            TimeProvider timeProvider,
+            OrderService orderService
     ) {
         this.checkoutSessionRepository = checkoutSessionRepository;
         this.paymentRepository = paymentRepository;
@@ -48,6 +51,7 @@ public class PaymentService {
         this.paymentProvider = paymentProvider;
         this.stridehubProperties = stridehubProperties;
         this.timeProvider = timeProvider;
+        this.orderService = orderService;
     }
 
     @Transactional
@@ -125,7 +129,10 @@ public class PaymentService {
 
         Instant attemptedAt = timeProvider.now();
         switch (event.eventType()) {
-            case "payment.captured" -> payment.markCaptured(attemptedAt);
+            case "payment.captured" -> {
+                payment.markCaptured(attemptedAt);
+                orderService.confirmCapturedPayment(payment);
+            }
             case "payment.failed" -> {
                 payment.markFailed("provider_reported_failure");
                 payment.getCheckoutSession().markPaymentFailed();

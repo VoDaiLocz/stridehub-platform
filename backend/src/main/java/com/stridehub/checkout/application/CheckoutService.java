@@ -70,6 +70,7 @@ public class CheckoutService {
                 throw new ConflictException("checkout.variant_unavailable", "One or more cart variants are unavailable");
             }
 
+            item.refreshUnitPrice(variant.getPriceAmount());
             BigDecimal currentLineTotal = variant.getPriceAmount().multiply(BigDecimal.valueOf(item.getQuantity()));
             subtotalAmount = subtotalAmount.add(currentLineTotal);
             commands.add(new InventoryReservationCommand(variant.getId(), item.getQuantity()));

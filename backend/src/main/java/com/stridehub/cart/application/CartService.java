@@ -71,7 +71,12 @@ public class CartService {
 
     private Cart loadOrCreateActiveCart(UUID userId) {
         return cartRepository.findDetailedByUserIdAndStatus(userId, CartStatus.ACTIVE)
-                .orElseGet(() -> cartRepository.save(new Cart(UUID.randomUUID(), loadUser(userId))));
+                .orElseGet(() -> cartRepository.findDetailedByUserId(userId)
+                        .map(existingCart -> {
+                            existingCart.resetToActive();
+                            return cartRepository.save(existingCart);
+                        })
+                        .orElseGet(() -> cartRepository.save(new Cart(UUID.randomUUID(), loadUser(userId)))));
     }
 
     private Cart loadExistingActiveCart(UUID userId) {

@@ -91,6 +91,10 @@ public class Product {
         return category;
     }
 
+    public UUID getSellerId() {
+        return sellerId;
+    }
+
     public Brand getBrand() {
         return brand;
     }

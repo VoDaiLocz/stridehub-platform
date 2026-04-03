@@ -31,8 +31,8 @@ This file is the day-to-day execution checklist for the repository. It is meant 
 - [x] Program 0 foundation is complete.
 - [x] Backend compile and test baseline already runs.
 - [x] Frontend buyer shell is scaffolded.
-- [-] Commerce core implementation is in progress through payment.
-- [-] Current recommended next task: `Task 1.7`.
+- [-] Commerce core implementation is in progress through order.
+- [-] Current recommended next task: `Task 1.8`.
 
 ## Task Execution Workflow
 
@@ -231,15 +231,15 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 
 **Goal:** create and advance orders only from confirmed payment outcomes.
 
-- [ ] Create order package structure.
-- [ ] Implement `Order` and `OrderItem`.
-- [ ] Build order creation path from checkout and payment records.
-- [ ] Enforce order state machine.
-- [ ] Commit inventory reservations only after payment success.
-- [ ] Support buyer order detail and basic cancellation rules.
-- [ ] Add tests for payment-confirmed order creation and duplicate webhook safety.
+- [x] Create order package structure.
+- [x] Implement `Order` and `OrderItem`.
+- [x] Build order creation path from checkout and payment records.
+- [x] Enforce order state machine for initial `PAID` order confirmation.
+- [x] Commit inventory reservations only after payment success.
+- [x] Support buyer order detail and order listing access.
+- [x] Add tests for payment-confirmed order creation and duplicate webhook safety.
 - [ ] Update OpenAPI orders contract.
-- [ ] Commit as `task 1.7: implement order creation and lifecycle state machine`.
+- [x] Commit as `task 1.7: implement order creation and lifecycle state machine`.
 
 ### Task 1.8: Implement Seller Application Workflow
 
@@ -489,3 +489,4 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 
 - `2026-04-04 00:54 +07:00` Task `1.5` verified locally with `.\mvnw.cmd test` (`63` tests, `0` failures) and `.\mvnw.cmd -q -DskipTests compile` before commit.
 - `2026-04-04 01:13 +07:00` Task `1.6` verified locally with `.\mvnw.cmd test` (`67` tests, `0` failures), `.\mvnw.cmd -q -DskipTests compile`, and payment-focused test coverage before commit.
+- `2026-04-04 01:30 +07:00` Task `1.7` verified locally with `.\mvnw.cmd -Dtest=OrderControllerIntegrationTest test`, `.\mvnw.cmd test` (`69` tests, `0` failures), and `.\mvnw.cmd -q -DskipTests compile` before commit.

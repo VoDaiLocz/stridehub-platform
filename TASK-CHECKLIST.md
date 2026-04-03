@@ -17,8 +17,8 @@ For implementation detail, use these source documents:
 
 ## Current Execution Position
 
-- Current repository baseline: `Program 0 complete, Program 1 through Task 1.6 in progress`
-- Current recommended next task: `Task 1.7`
+- Current repository baseline: `Program 0 complete, Program 1 through Task 1.7 in progress`
+- Current recommended next task: `Task 1.8`
 - Current execution mode: `follow numbered tasks in order`
 
 ## Phase Summary
@@ -26,7 +26,7 @@ For implementation detail, use these source documents:
 | Program | Phase Name | Scope | Status | Next Gate |
 | --- | --- | --- | --- | --- |
 | 0 | Engineering Foundation | monorepo, backend baseline, frontend shell, CI, docs alignment | `[x]` | Start `Task 1.1` |
-| 1 | Commerce Core | identity, catalog, inventory, cart, checkout, payment, order, seller application, audit/outbox baseline | `[-]` | Continue from `Task 1.6` through `1.12` |
+| 1 | Commerce Core | identity, catalog, inventory, cart, checkout, payment, order, seller application, audit/outbox baseline | `[-]` | Continue from `Task 1.7` through `1.12` |
 | 2 | Marketplace Governance | seller lifecycle, admin seller decisions, seller products, moderation, seller inventory | `[ ]` | Start only after Phase 1 exit criteria passes |
 | 3 | Financial and Operational Integrity | audit hardening, outbox dispatch, refunds, reconciliation, support tooling | `[ ]` | Start only after payment and order flows are stable |
 | 4 | Scale and Production Readiness | notifications, observability, abuse controls, demo fixtures, production docs alignment | `[ ]` | Start only after Programs 1 to 3 are complete |
@@ -47,7 +47,7 @@ For implementation detail, use these source documents:
 | 1 | 1.4 | Implement Cart Module | `backend/cart` | `[x]` | `1.1`, `1.2` | buyer cart CRUD and cart validation baseline | cart drawer/page and add-to-cart integration | cart API tests | `task 1.4` |
 | 1 | 1.5 | Implement Checkout Session Module | `backend/checkout` | `[x]` | `1.3`, `1.4` | checkout snapshot, revalidation, reservation orchestration | checkout page, error rendering, expiry UX | checkout validation tests | `task 1.5` |
 | 1 | 1.6 | Implement Payment Module with Provider Abstraction | `backend/payment` | `[x]` | `1.5` | payment initiation, provider abstraction, signed webhook handling, idempotency | payment pending/success/failure flow in buyer web | duplicate webhook tests + signature validation tests | `task 1.6` |
-| 1 | 1.7 | Implement Order Module | `backend/order` | `[-]` | `1.5`, `1.6` | order creation from payment-confirmed checkout, state machine, buyer order access | order confirmation, order history, order detail pages | order lifecycle tests + duplicate confirm tests | `task 1.7` |
+| 1 | 1.7 | Implement Order Module | `backend/order` | `[x]` | `1.5`, `1.6` | order creation from payment-confirmed checkout, state machine, buyer order access | order confirmation, order history, order detail pages | order lifecycle tests + duplicate confirm tests | `task 1.7` |
 | 1 | 1.8 | Implement Seller Application Workflow | `backend/seller` | `[ ]` | `1.1` | seller application submission baseline | seller application form and status view in account area | seller application tests | `task 1.8` |
 | 1 | 1.9 | Implement Audit and Outbox Foundation | `backend/audit` + shared persistence | `[ ]` | `1.6`, `1.7`, `1.8` | initial audit log and outbox persistence for critical transitions | expose only safe status breadcrumbs; no major new page | audit/outbox persistence tests | `task 1.9` |
 | 1 | 1.10 | Tighten API Documentation and Error Contract | `docs/` + backend web layer | `[ ]` | `1.1` to `1.9` | OpenAPI, path/versioning, error-envelope alignment | remove stale mocks and sync FE request/response types | docs review against implementation | `task 1.10` |
@@ -83,6 +83,6 @@ For implementation detail, use these source documents:
 
 | Priority | Action | Why |
 | --- | --- | --- |
-| 1 | Implement `Task 1.7` order creation and lifecycle state machine | closes the payment-to-order commerce core path |
-| 2 | Implement `Task 1.8` seller application workflow and admin decisions | completes marketplace onboarding baseline for Phase 1 |
+| 1 | Implement `Task 1.8` seller application workflow | completes marketplace onboarding baseline for Phase 1 |
+| 2 | Implement `Task 1.9` audit and outbox foundation | closes the minimum operational integrity gap in Phase 1 |
 | 3 | Reconcile OpenAPI and path/versioning during `Task 1.10` | documentation still trails the implemented Phase 1 contract |

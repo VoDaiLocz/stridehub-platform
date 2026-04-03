@@ -101,4 +101,13 @@ public class Cart {
     public void removeItem(UUID itemId) {
         items.removeIf(item -> item.getId().equals(itemId));
     }
+
+    public void markCheckedOut() {
+        this.status = CartStatus.CHECKED_OUT;
+    }
+
+    public void resetToActive() {
+        this.status = CartStatus.ACTIVE;
+        this.items.clear();
+    }
 }
