@@ -9,6 +9,7 @@ import com.stridehub.catalog.domain.ProductStatus;
 import com.stridehub.catalog.domain.ProductVariant;
 import com.stridehub.catalog.domain.ProductVariantStatus;
 import com.stridehub.checkout.domain.CheckoutSession;
+import com.stridehub.checkout.domain.CheckoutSessionStatus;
 import com.stridehub.checkout.infrastructure.CheckoutSessionRepository;
 import com.stridehub.checkout.web.CheckoutSessionResponse;
 import com.stridehub.common.exception.ConflictException;
@@ -19,6 +20,7 @@ import com.stridehub.inventory.application.InventoryService;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -115,6 +117,20 @@ public class CheckoutService {
                 savedSession.getTotalAmount(),
                 savedSession.getCurrencyCode()
         );
+    }
+
+    @Transactional
+    public void expireExpiredSessions() {
+        Instant now = timeProvider.now();
+        List<CheckoutSession> expiredSessions = checkoutSessionRepository.findByStatusInAndExpiresAtBefore(
+                List.copyOf(EnumSet.of(CheckoutSessionStatus.PENDING_PAYMENT, CheckoutSessionStatus.PAYMENT_INITIATED)),
+                now
+        );
+
+        for (CheckoutSession checkoutSession : expiredSessions) {
+            inventoryService.expireCheckoutReservations(checkoutSession.getId());
+            checkoutSession.markExpired();
+        }
     }
 
     private CheckoutSession refreshExistingSession(

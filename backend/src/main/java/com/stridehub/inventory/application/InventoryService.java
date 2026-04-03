@@ -3,7 +3,6 @@ package com.stridehub.inventory.application;
 import com.stridehub.catalog.domain.ProductVariant;
 import com.stridehub.common.exception.ConflictException;
 import com.stridehub.common.exception.NotFoundException;
-import com.stridehub.common.time.TimeProvider;
 import com.stridehub.inventory.domain.InventoryItem;
 import com.stridehub.inventory.domain.InventoryReservation;
 import com.stridehub.inventory.domain.InventoryReservationStatus;
@@ -22,18 +21,15 @@ public class InventoryService {
     private final InventoryItemRepository inventoryItemRepository;
     private final InventoryReservationRepository inventoryReservationRepository;
     private final ProductVariantRepository productVariantRepository;
-    private final TimeProvider timeProvider;
 
     public InventoryService(
             InventoryItemRepository inventoryItemRepository,
             InventoryReservationRepository inventoryReservationRepository,
-            ProductVariantRepository productVariantRepository,
-            TimeProvider timeProvider
+            ProductVariantRepository productVariantRepository
     ) {
         this.inventoryItemRepository = inventoryItemRepository;
         this.inventoryReservationRepository = inventoryReservationRepository;
         this.productVariantRepository = productVariantRepository;
-        this.timeProvider = timeProvider;
     }
 
     @Transactional
@@ -75,15 +71,11 @@ public class InventoryService {
 
     @Transactional
     public void expireCheckoutReservations(UUID checkoutSessionId) {
-        Instant now = timeProvider.now();
         List<InventoryReservation> reservations = inventoryReservationRepository.findByCheckoutSessionIdAndStatus(
                 checkoutSessionId,
                 InventoryReservationStatus.ACTIVE
         );
         for (InventoryReservation reservation : reservations) {
-            if (reservation.isActive(now)) {
-                continue;
-            }
             InventoryItem inventoryItem = lockedInventoryItem(reservation.getVariant().getId());
             inventoryItem.release(reservation.getQuantity());
             reservation.expire();
