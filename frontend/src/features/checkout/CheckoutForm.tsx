@@ -1,9 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useCart } from '../../context/CartContext';
+import StripeCardMock from './StripeCardMock';
 import './CheckoutForm.css';
 
 const CheckoutForm: React.FC = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const { cart, clearCart, subtotal, tax, total } = useCart();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const orderSnapshot = {
+      items: [...cart],
+      subtotal,
+      tax,
+      total
+    };
+
+    // Simulate delay
+    await new Promise((resolve) => setTimeout(resolve, 2500));
+
+    setIsSubmitting(false);
+    clearCart();
+    navigate('/checkout/success', { state: { order: orderSnapshot } });
+  };
+
   return (
-    <div className="checkout-form">
+    <form className="checkout-form" onSubmit={handleSubmit}>
+      {/* ... breadcrumb ... */}
       <nav className="checkout-breadcrumb">
         <span className="breadcrumb-item-link">Cart</span>
         <span className="breadcrumb-separator">/</span>
@@ -17,25 +44,25 @@ const CheckoutForm: React.FC = () => {
       <section className="form-section">
         <h2 className="section-title">Contact</h2>
         <div className="form-group">
-          <input type="email" placeholder="Email" className="form-input" />
+          <input type="email" placeholder="Email" className="form-input" required disabled={isSubmitting} />
         </div>
       </section>
 
       <section className="form-section">
         <h2 className="section-title">Shipping Address</h2>
         <div className="form-grid">
-          <input type="text" placeholder="First Name" className="form-input" />
-          <input type="text" placeholder="Last Name" className="form-input" />
+          <input type="text" placeholder="First Name" className="form-input" required disabled={isSubmitting} />
+          <input type="text" placeholder="Last Name" className="form-input" required disabled={isSubmitting} />
         </div>
         <div className="form-group">
-          <input type="text" placeholder="Address" className="form-input" />
+          <input type="text" placeholder="Address" className="form-input" required disabled={isSubmitting} />
         </div>
         <div className="form-group">
-          <input type="text" placeholder="Apartment, suite, etc. (optional)" className="form-input" />
+          <input type="text" placeholder="Apartment, suite, etc. (optional)" className="form-input" disabled={isSubmitting} />
         </div>
         <div className="form-grid city-grid">
-          <input type="text" placeholder="City" className="form-input" />
-          <input type="text" placeholder="Postal Code" className="form-input" />
+          <input type="text" placeholder="City" className="form-input" required disabled={isSubmitting} />
+          <input type="text" placeholder="Postal Code" className="form-input" required disabled={isSubmitting} />
         </div>
       </section>
 
@@ -43,24 +70,18 @@ const CheckoutForm: React.FC = () => {
         <h2 className="section-title">Payment</h2>
         <p className="section-subtitle">All transactions are secure and encrypted.</p>
         <div className="payment-placeholder">
-          <div className="credit-card-shell">
-            <div className="form-group">
-              <input type="text" placeholder="Card Number" className="form-input" disabled />
-            </div>
-            <div className="form-grid">
-              <input type="text" placeholder="Expiry (MM/YY)" className="form-input" disabled />
-              <input type="text" placeholder="CVV" className="form-input" disabled />
-            </div>
-          </div>
-          <p className="payment-note">Secure payment gateway integration coming in Task 1.6</p>
+          <StripeCardMock disabled={isSubmitting} />
+          <p className="payment-note">Secure payment gateway integration simulated with Stripe Mock</p>
         </div>
       </section>
 
-      <button className="primary-button checkout-button" disabled>
-        Complete Order
+      <button type="submit" className="primary-button checkout-button" disabled={isSubmitting}>
+        {isSubmitting ? <div className="spinner"></div> : 'Complete Order'}
       </button>
-    </div>
+    </form>
   );
 };
+
+
 
 export default CheckoutForm;

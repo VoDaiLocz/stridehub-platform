@@ -1,0 +1,80 @@
+.stripe-card-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background-color: #fff;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.stripe-card-container.focused {
+  border-color: #000;
+  box-shadow: 0 0 0 1px #000;
+}
+
+.stripe-card-container.disabled {
+  background-color: #f7f7f7;
+  border-color: #eee;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.stripe-card-icon {
+  color: #888;
+  display: flex;
+}
+
+.stripe-card-inputs {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.stripe-divider {
+  width: 1px;
+  height: 16px;
+  background-color: #eee;
+  margin: 0 8px;
+}
+
+.stripe-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--text-main);
+  padding: 0;
+  display: block;
+}
+
+.stripe-input::placeholder {
+  color: #999;
+}
+
+.stripe-input:disabled {
+  cursor: not-allowed;
+}
+
+/* Width control */
+.card-num {
+  flex: 1;
+}
+
+.card-expiry {
+  width: 70px;
+  text-align: center;
+}
+
+.card-cvc {
+  width: 50px;
+  text-align: center;
+}
+
+/* Chrome/Safari bug fix for spacing */
+.stripe-input {
+  min-width: 0;
+}
