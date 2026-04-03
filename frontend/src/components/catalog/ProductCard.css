@@ -2,6 +2,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  text-decoration: none;
+  color: inherit;
   transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
   padding: 10px;
   border-radius: 12px;

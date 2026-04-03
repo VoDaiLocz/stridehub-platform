@@ -1,39 +1,35 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import './Auth.css';
+import React, { useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/useAuth'
+import { getApiErrorMessage } from '../../lib/api/errors'
+import { register as registerRequest } from '../../lib/api/identity'
+import './Auth.css'
 
 const RegisterPage: React.FC = () => {
-    const { login } = useAuth();
-    const navigate = useNavigate();
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false);
+    const { login } = useAuth()
+    const navigate = useNavigate()
+    const location = useLocation()
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [error, setError] = useState('')
+    const [loading, setLoading] = useState(false)
 
-    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080';
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-        setError('');
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+        setLoading(true)
+        setError('')
 
         try {
-            const response = await axios.post(`${apiBaseUrl}/api/v1/identity/register`, {
-                name,
-                email,
-                password,
-            });
-            login(response.data.token);
-            navigate('/');
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Registration failed. Please try again.');
+            const session = await registerRequest({ name, email, password })
+            await login(session)
+            navigate((location.state as { from?: string } | null)?.from ?? '/')
+        } catch (error) {
+            setError(getApiErrorMessage(error, 'Registration failed. Please try again.'))
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
     return (
         <div className="auth-container">
@@ -90,7 +86,7 @@ const RegisterPage: React.FC = () => {
                 </div>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default RegisterPage;
+export default RegisterPage

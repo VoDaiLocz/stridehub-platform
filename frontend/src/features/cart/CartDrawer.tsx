@@ -1,21 +1,21 @@
-import React from 'react';
-import { useCart } from '../../context/CartContext';
-import { useNavigate } from 'react-router-dom';
-import './CartDrawer.css';
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useCart } from '../../context/useCart'
+import './CartDrawer.css'
 
 const CartDrawer: React.FC = () => {
-  const { items, removeItem, updateQuantity, subtotal, isCartOpen, setIsCartOpen } = useCart();
-  const navigate = useNavigate();
-  const freeShippingThreshold = 120;
-  const deliveryProgress = Math.min((subtotal / freeShippingThreshold) * 100, 100);
-  const remainingForFreeShipping = freeShippingThreshold - subtotal;
+  const { items, removeItem, updateQuantity, subtotal, isCartOpen, setIsCartOpen } = useCart()
+  const navigate = useNavigate()
+  const freeShippingThreshold = 120
+  const deliveryProgress = Math.min((subtotal / freeShippingThreshold) * 100, 100)
+  const remainingForFreeShipping = freeShippingThreshold - subtotal
 
-  if (!isCartOpen) return null;
+  if (!isCartOpen) return null
 
   const handleCheckout = () => {
-    setIsCartOpen(false);
-    navigate('/checkout');
-  };
+    setIsCartOpen(false)
+    navigate('/checkout')
+  }
 
   return (
     <div className={`cart-overlay ${isCartOpen ? 'cart-overlay--open' : ''}`} onClick={() => setIsCartOpen(false)}>
@@ -86,7 +86,7 @@ const CartDrawer: React.FC = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CartDrawer;
+export default CartDrawer

@@ -82,6 +82,13 @@
   gap: 16px;
 }
 
+.live-catalog-note {
+  margin-top: 2rem;
+  margin-bottom: -1rem;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+}
+
 .btn-pill {
   display: inline-flex;
   align-items: center;

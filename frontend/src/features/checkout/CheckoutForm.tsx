@@ -1,36 +1,52 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../context/CartContext';
-import StripeCardMock from './StripeCardMock';
-import './CheckoutForm.css';
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useCart } from '../../context/useCart'
+import StripeCardMock from './StripeCardMock'
+import './CheckoutForm.css'
+
+interface CheckoutOrderSnapshotItem {
+  id: string
+  name: string
+  image: string
+  price: number
+  quantity: number
+  variant?: string
+}
+
+interface CheckoutOrderSnapshot {
+  orderNumber: string
+  items: CheckoutOrderSnapshotItem[]
+  subtotal: number
+  tax: number
+  total: number
+}
 
 const CheckoutForm: React.FC = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
-  const { cart, clearCart, subtotal, tax, total } = useCart();
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const navigate = useNavigate()
+  const { items, clearCart, subtotal, tax, total } = useCart()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setIsSubmitting(true)
 
-    const orderSnapshot = {
-      items: [...cart],
+    const orderSnapshot: CheckoutOrderSnapshot = {
+      orderNumber: `SH-DEMO-${Date.now().toString().slice(-6)}`,
+      items: [...items],
       subtotal,
       tax,
-      total
-    };
+      total,
+    }
 
-    // Simulate delay
-    await new Promise((resolve) => setTimeout(resolve, 2500));
+    await new Promise((resolve) => setTimeout(resolve, 1200))
 
-    setIsSubmitting(false);
-    clearCart();
-    navigate('/checkout/success', { state: { order: orderSnapshot } });
-  };
+    setIsSubmitting(false)
+    clearCart()
+    navigate('/checkout/success', { state: { order: orderSnapshot } })
+  }
 
   return (
     <form className="checkout-form" onSubmit={handleSubmit}>
-      {/* ... breadcrumb ... */}
       <nav className="checkout-breadcrumb">
         <span className="breadcrumb-item-link">Cart</span>
         <span className="breadcrumb-separator">/</span>
@@ -79,9 +95,7 @@ const CheckoutForm: React.FC = () => {
         {isSubmitting ? <div className="spinner"></div> : 'Complete Order'}
       </button>
     </form>
-  );
-};
+  )
+}
 
-
-
-export default CheckoutForm;
+export default CheckoutForm

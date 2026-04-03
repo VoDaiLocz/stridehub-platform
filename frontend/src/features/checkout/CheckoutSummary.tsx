@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useCart } from '../../context/CartContext';
-import { Clock } from 'lucide-react';
-import './CheckoutSummary.css';
+import React, { useEffect, useState } from 'react'
+import { Clock } from 'lucide-react'
+import { useCart } from '../../context/useCart'
+import './CheckoutSummary.css'
 
 const CheckoutSummary: React.FC = () => {
-  const { items, subtotal } = useCart();
-  const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
+  const { items, subtotal, shipping, tax, total } = useCart()
+  const [timeLeft, setTimeLeft] = useState(600)
 
   useEffect(() => {
-    if (timeLeft <= 0) return;
+    if (timeLeft <= 0) return
     const timer = setInterval(() => {
       setTimeLeft(prev => prev - 1);
     }, 1000);
@@ -20,10 +20,6 @@ const CheckoutSummary: React.FC = () => {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  const shipping = subtotal >= 120 ? 0 : 15;
-  const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
 
   return (
     <div className="checkout-summary">
@@ -67,7 +63,7 @@ const CheckoutSummary: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default CheckoutSummary;
+export default CheckoutSummary

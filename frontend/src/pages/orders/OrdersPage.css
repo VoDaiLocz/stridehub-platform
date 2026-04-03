@@ -1,0 +1,119 @@
+.orders-page {
+  background: linear-gradient(180deg, #f7f7f4 0%, #ffffff 35%);
+}
+
+.orders-shell {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.text-link {
+  color: var(--text-main);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  width: fit-content;
+}
+
+.orders-heading h1,
+.order-detail-card h1 {
+  margin: 0.6rem 0 0.75rem;
+  font-size: clamp(2.4rem, 4vw, 4rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+.orders-heading p {
+  color: var(--text-muted);
+}
+
+.orders-empty {
+  display: grid;
+  gap: 1rem;
+  place-items: start;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 1.25rem;
+}
+
+.orders-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.order-card,
+.order-detail-card {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-radius: 1.4rem;
+  background: rgba(255, 255, 255, 0.88);
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(16, 16, 16, 0.06);
+}
+
+.order-card {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.order-card h2 {
+  margin: 0.35rem 0 0;
+}
+
+.order-card__meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.4rem;
+  color: var(--text-muted);
+}
+
+.order-detail-card__header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+.order-detail-items {
+  display: grid;
+  gap: 1rem;
+}
+
+.order-detail-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: start;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(16, 16, 16, 0.08);
+}
+
+.order-detail-item h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.order-detail-item p {
+  margin: 0.25rem 0 0;
+  color: var(--text-muted);
+}
+
+.order-detail-item__numbers {
+  display: grid;
+  justify-items: end;
+  gap: 0.35rem;
+}
+
+@media (max-width: 768px) {
+  .order-card,
+  .order-detail-card__header,
+  .order-detail-item {
+    grid-template-columns: 1fr;
+  }
+
+  .order-card__meta,
+  .order-detail-item__numbers {
+    justify-items: start;
+  }
+}

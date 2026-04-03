@@ -1,0 +1,96 @@
+.page-shell {
+  padding: 3rem 0 5rem;
+}
+
+.page-shell--center {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.page-shell--error {
+  color: #8e2c2c;
+}
+
+.collection-page {
+  background: linear-gradient(180deg, #f8f4ee 0%, #ffffff 35%);
+}
+
+.collection-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  align-items: end;
+  padding-top: 2rem;
+  padding-bottom: 1.5rem;
+}
+
+.collection-hero h1 {
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  margin: 0.6rem 0 1rem;
+}
+
+.collection-hero p {
+  max-width: 48rem;
+  color: var(--text-muted);
+}
+
+.eyebrow {
+  display: inline-flex;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #875f2d;
+}
+
+.collection-controls {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 1rem;
+}
+
+.filter-field {
+  display: grid;
+  gap: 0.55rem;
+  min-width: 14rem;
+}
+
+.filter-field span {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+}
+
+.filter-field select {
+  border: 1px solid rgba(16, 16, 16, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  padding: 0.85rem 1rem;
+}
+
+.text-link {
+  color: var(--text-main);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+@media (max-width: 768px) {
+  .collection-hero {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .collection-controls {
+    justify-content: stretch;
+  }
+
+  .filter-field {
+    width: 100%;
+  }
+}

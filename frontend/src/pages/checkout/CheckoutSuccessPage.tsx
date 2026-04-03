@@ -1,12 +1,28 @@
-import { useNavigate, useLocation } from 'react-router-dom';
-import { CheckCircle, ArrowRight, Package, Mail, Download } from 'lucide-react';
-import './CheckoutSuccessPage.css';
+import { useLocation, useNavigate } from 'react-router-dom'
+import { ArrowRight, CheckCircle, Package } from 'lucide-react'
+import './CheckoutSuccessPage.css'
+
+interface CheckoutSuccessOrderItem {
+  id: string
+  name: string
+  image: string
+  price: number
+  quantity: number
+}
+
+interface CheckoutSuccessOrder {
+  orderNumber: string
+  items: CheckoutSuccessOrderItem[]
+  subtotal: number
+  tax: number
+  total: number
+}
 
 const CheckoutSuccessPage: React.FC = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const orderData = location.state?.order;
-  const orderNumber = `SH-${Math.floor(Math.random() * 1000000).toString().padStart(6, '0')}`;
+  const navigate = useNavigate()
+  const location = useLocation()
+  const orderData = (location.state?.order as CheckoutSuccessOrder | undefined) ?? null
+  const orderNumber = orderData?.orderNumber ?? 'SH-DEMO-000001'
 
   return (
     <div className="success-page">
@@ -22,14 +38,14 @@ const CheckoutSuccessPage: React.FC = () => {
             </p>
           </div>
 
-          {orderData && (
+          {orderData ? (
             <div className="order-recap-section">
               <div className="recap-header">
                 <Package size={20} />
                 <span>Order Summary</span>
               </div>
               <div className="recap-items">
-                {orderData.items.map((item: any) => (
+                {orderData.items.map((item) => (
                   <div key={item.id} className="recap-item">
                     <div className="item-thumb-wrapper">
                       <img src={item.image} alt={item.name} className="item-thumb" />
@@ -58,7 +74,7 @@ const CheckoutSuccessPage: React.FC = () => {
                 </div>
               </div>
             </div>
-          )}
+          ) : null}
 
           <div className="success-footer-info">
             <div className="info-grid">
@@ -94,8 +110,7 @@ const CheckoutSuccessPage: React.FC = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-
-export default CheckoutSuccessPage;
+export default CheckoutSuccessPage

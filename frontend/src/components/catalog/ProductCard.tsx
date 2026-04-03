@@ -1,79 +1,71 @@
-import React from 'react';
-import Badge from '../common/Badge';
-import { useCart } from '../../context/CartContext';
-import './ProductCard.css';
+import React from 'react'
+import { Link } from 'react-router-dom'
+import Badge from '../common/Badge'
+import { useCart } from '../../context/useCart'
+import type { ProductCardModel } from '../../features/catalog/types'
+import './ProductCard.css'
 
-interface ProductCardProps {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
-  category: string;
-  stock: number;
-  isNew?: boolean;
-}
-
-const ProductCard: React.FC<ProductCardProps> = ({ 
-  id, 
-  name, 
-  price, 
-  image, 
-  category, 
-  stock, 
-  isNew 
+const ProductCard: React.FC<ProductCardModel> = ({
+  id,
+  slug,
+  name,
+  price,
+  image,
+  category,
+  stock,
+  isNew,
+  variantLabel,
 }) => {
-  const { addItem } = useCart();
-  const isOutOfStock = stock === 0;
-  const isLowStock = stock > 0 && stock <= 5;
+  const { addItem } = useCart()
+  const isOutOfStock = stock === 0
+  const isLowStock = stock > 0 && stock <= 5
 
-  const handleAddToCart = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addItem({ id, name, price, image, quantity: 1 });
-  };
+  const handleAddToCart = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    addItem({ id, name, price, image, quantity: 1, variant: variantLabel })
+  }
 
   return (
-    <div className={`product-card ${isOutOfStock ? 'product-card--out-of-stock' : ''}`} data-product-id={id}>
+    <Link to={`/products/${slug}`} className={`product-card ${isOutOfStock ? 'product-card--out-of-stock' : ''}`} data-product-id={id}>
       <div className="product-card__image-wrapper">
         <img src={image} alt={name} className="product-card__image" />
-        
-        {/* Inventory Badges */}
+
         <div className="product-card__badges">
-          {isOutOfStock && <Badge text="Out of Stock" type="default" className="badge--oos" />}
-          {isLowStock && <Badge text={`Only ${stock} Left!`} type="inventory" />}
-          {isNew && !isOutOfStock && <Badge text="New Arrival" type="new" />}
+          {isOutOfStock ? <Badge text="Out of Stock" type="default" className="badge--oos" /> : null}
+          {isLowStock ? <Badge text={`Only ${stock} Left!`} type="inventory" /> : null}
+          {isNew && !isOutOfStock ? <Badge text="New Arrival" type="new" /> : null}
         </div>
 
-        {/* Quick Add (Visible on Hover in Vessi) */}
-        {!isOutOfStock && (
+        {!isOutOfStock ? (
           <div className="product-card__quick-add">
             <button className="btn btn-primary btn-sm" onClick={handleAddToCart}>
               Add to Cart
             </button>
           </div>
-        )}
+        ) : null}
       </div>
 
       <div className="product-card__info">
         <span className="product-card__category">{category}</span>
         <h3 className="product-card__title">{name}</h3>
         <p className="product-card__price">${price.toFixed(2)}</p>
-        
-        {isLowStock && (
+
+        {isLowStock ? (
           <p className="product-card__stock-text product-card__stock-text--low">
             Hurry, only {stock} left in stock!
           </p>
-        )}
-        
-        {isOutOfStock && (
+        ) : null}
+
+        {isOutOfStock ? (
           <p className="product-card__stock-text product-card__stock-text--none">
             Currently unavailable
           </p>
-        )}
+        ) : null}
       </div>
-    </div>
-  );
-};
+    </Link>
+  )
+}
 
-export default ProductCard;
+export default ProductCard
 
