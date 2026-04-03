@@ -31,8 +31,8 @@ This file is the day-to-day execution checklist for the repository. It is meant 
 - [x] Program 0 foundation is complete.
 - [x] Backend compile and test baseline already runs.
 - [x] Frontend buyer shell is scaffolded.
-- [ ] Business modules are not implemented yet.
-- [-] Current recommended next task: `Task 1.1`.
+- [-] Commerce core implementation is in progress through checkout.
+- [-] Current recommended next task: `Task 1.6`.
 
 ## Task Execution Workflow
 
@@ -142,73 +142,73 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 
 **Goal:** deliver authentication, refresh-token rotation, RBAC, and current-profile access.
 
-- [ ] Create `identity/domain`, `identity/application`, `identity/infrastructure`, and `identity/web`.
-- [ ] Implement `User`, `Role`, `RefreshToken`, and `Address`.
-- [ ] Ensure role seeding strategy remains consistent with Flyway baseline.
-- [ ] Implement Argon2 password hashing.
-- [ ] Implement JWT issue and validation flow.
-- [ ] Implement register endpoint.
-- [ ] Implement login endpoint.
-- [ ] Implement refresh-token rotation endpoint.
-- [ ] Implement current user endpoint.
-- [ ] Add integration tests for register, login, refresh, and protected `/me`.
+- [x] Create `identity/domain`, `identity/application`, `identity/infrastructure`, and `identity/web`.
+- [x] Implement `User`, `Role`, `RefreshToken`, and `Address`.
+- [x] Ensure role seeding strategy remains consistent with Flyway baseline.
+- [x] Implement Argon2 password hashing.
+- [x] Implement JWT issue and validation flow.
+- [x] Implement register endpoint.
+- [x] Implement login endpoint.
+- [x] Implement refresh-token rotation endpoint.
+- [x] Implement current user endpoint.
+- [x] Add integration tests for register, login, refresh, and protected `/me`.
 - [ ] Update OpenAPI and auth docs to match the implemented endpoint shape.
-- [ ] Commit as `task 1.1: implement authentication and rbac foundation`.
+- [x] Commit as `task 1.1: implement authentication and rbac foundation`.
 
 ### Task 1.2: Implement Catalog Module
 
 **Goal:** expose buyer-facing product discovery for active products and variants.
 
-- [ ] Create catalog package structure.
-- [ ] Implement `Category`, `Brand`, `Product`, `ProductVariant`, and `ProductImage`.
-- [ ] Add repository queries for listing and detail by slug.
-- [ ] Support category, brand, size, and color filters.
-- [ ] Return DTOs instead of exposing entities directly.
-- [ ] Ensure only `ACTIVE` products are exposed publicly.
-- [ ] Add test fixtures or seed strategy for catalog scenarios.
-- [ ] Add API tests for product listing and detail.
+- [x] Create catalog package structure.
+- [x] Implement `Category`, `Brand`, `Product`, `ProductVariant`, and `ProductImage`.
+- [x] Add repository queries for listing and detail by slug.
+- [x] Support category, brand, size, and color filters.
+- [x] Return DTOs instead of exposing entities directly.
+- [x] Ensure only `ACTIVE` products are exposed publicly.
+- [x] Add test fixtures or seed strategy for catalog scenarios.
+- [x] Add API tests for product listing and detail.
 - [ ] Update OpenAPI catalog paths and examples.
-- [ ] Commit as `task 1.2: add catalog browsing and product detail endpoints`.
+- [x] Commit as `task 1.2: add catalog browsing and product detail endpoints`.
 
 ### Task 1.3: Implement Inventory Module
 
 **Goal:** introduce stock truth and reservation lifecycle per variant SKU.
 
-- [ ] Create inventory package structure.
-- [ ] Implement `InventoryItem`.
-- [ ] Implement `InventoryReservation`.
-- [ ] Add optimistic locking or equivalent stock concurrency control.
-- [ ] Implement reservation create logic with insufficient-stock failure path.
-- [ ] Implement reservation commit logic.
-- [ ] Implement reservation release logic.
-- [ ] Add expiry timestamps and release hook placeholder.
-- [ ] Add low-stock concurrency integration tests.
-- [ ] Commit as `task 1.3: implement sku inventory and reservation lifecycle`.
+- [x] Create inventory package structure.
+- [x] Implement `InventoryItem`.
+- [x] Implement `InventoryReservation`.
+- [x] Add optimistic locking or equivalent stock concurrency control.
+- [x] Implement reservation create logic with insufficient-stock failure path.
+- [x] Implement reservation commit logic.
+- [x] Implement reservation release logic.
+- [x] Add expiry timestamps and release hook placeholder.
+- [x] Add low-stock concurrency integration tests.
+- [x] Commit as `task 1.3: implement sku inventory and reservation lifecycle`.
 
 ### Task 1.4: Implement Cart Module
 
 **Goal:** allow buyers to build carts without turning cart state into the pricing source of truth.
 
-- [ ] Create cart package structure.
-- [ ] Implement `Cart` and `CartItem`.
-- [ ] Support add item, update quantity, remove item, clear cart, and get current cart.
-- [ ] Validate variant existence and basic availability before accepting line items.
-- [ ] Keep stored cart pricing revalidatable rather than final.
-- [ ] Add tests for cart mutation and validation behavior.
+- [x] Create cart package structure.
+- [x] Implement `Cart` and `CartItem`.
+- [x] Support add item, update quantity, remove item, clear cart, and get current cart.
+- [x] Validate variant existence and basic availability before accepting line items.
+- [x] Keep stored cart pricing revalidatable rather than final.
+- [x] Add tests for cart mutation and validation behavior.
 - [ ] Update OpenAPI cart contract.
-- [ ] Commit as `task 1.4: add buyer cart management flow`.
+- [x] Commit as `task 1.4: add buyer cart management flow`.
 
 ### Task 1.5: Implement Checkout Session Module
 
 **Goal:** convert a mutable cart into a validated checkout snapshot and inventory reservation request.
 
-- [ ] Create checkout package structure.
-- [ ] Implement `CheckoutSession`.
-- [ ] Snapshot buyer address, shipping, and pricing inputs needed for checkout.
-- [ ] Revalidate price and stock at checkout start.
-- [ ] Create inventory reservations for selected items.
+- [x] Create checkout package structure.
+- [x] Implement `CheckoutSession`.
+- [x] Snapshot buyer address, shipping, and pricing inputs needed for checkout.
+- [x] Revalidate price and stock at checkout start.
+- [x] Create inventory reservations for selected items.
 - [ ] Support cancel or timeout path that releases reservations.
-- [ ] Add tests for stale cart data and reservation failure.
+- [x] Add tests for stale cart data and reservation failure.
 - [ ] Update OpenAPI checkout contract.
 - [ ] Commit as `task 1.5: add checkout session and validation flow`.
 
@@ -484,3 +484,7 @@ This is the current implementation phase. Use the detailed Phase 1 plan as the d
 - [ ] Frontend lint and build checks pass.
 - [ ] Docs do not overstate implementation status.
 - [ ] Commit history remains traceable to numbered tasks.
+
+## Execution Log
+
+- `2026-04-04 00:54 +07:00` Task `1.5` verified locally with `.\mvnw.cmd test` (`63` tests, `0` failures) and `.\mvnw.cmd -q -DskipTests compile` before commit.
