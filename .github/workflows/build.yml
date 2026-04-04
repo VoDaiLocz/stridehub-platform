@@ -13,6 +13,9 @@ on:
 permissions:
   contents: read
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -92,13 +95,22 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: '22'
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
 
       - name: Enable Corepack and activate pnpm
         run: |
           corepack enable
           corepack prepare pnpm@10.28.2 --activate
+
+      - name: Resolve pnpm store directory
+        run: echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
+
+      - name: Restore pnpm store cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PNPM_STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
