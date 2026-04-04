@@ -99,6 +99,7 @@ This repository contains both:
 - [Master Task Checklist](./TASK-CHECKLIST.md)
 - [Execution Checklist and Progress Tracker](./PROGRESS.md)
 - [GitHub Engineering Workflow](./docs/github-engineering-workflow.md)
+- [TDD Engineering Workflow](./docs/tdd-engineering-workflow.md)
 - [Backend Workspace Guide](./backend/README.md)
 - [Frontend Workspace Guide](./frontend/README.md)
 

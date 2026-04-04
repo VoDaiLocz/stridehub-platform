@@ -1,0 +1,221 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: Optional tag name to publish, for example v1.2.0
+        required: false
+        type: string
+      publish_release:
+        description: Publish a GitHub Release after packaging
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-meta:
+    name: Release Metadata
+    runs-on: ubuntu-latest
+    outputs:
+      release_tag: ${{ steps.meta.outputs.release_tag }}
+      publish_release: ${{ steps.meta.outputs.publish_release }}
+
+    steps:
+      - name: Resolve release mode
+        id: meta
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            release_tag="${GITHUB_REF_NAME}"
+            publish_release="true"
+          else
+            release_tag="${{ github.event.inputs.release_version }}"
+            publish_release="${{ github.event.inputs.publish_release }}"
+          fi
+
+          if [[ "${publish_release}" == "true" && -z "${release_tag}" ]]; then
+            echo "A release tag is required when publish_release=true." >&2
+            exit 1
+          fi
+
+          echo "release_tag=${release_tag}" >> "${GITHUB_OUTPUT}"
+          echo "publish_release=${publish_release}" >> "${GITHUB_OUTPUT}"
+
+  backend-package:
+    name: Release Backend Package
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs:
+      - release-meta
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Temurin JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Ensure Maven wrapper is executable
+        run: chmod +x mvnw
+
+      - name: Verify and package backend
+        run: ./mvnw -B -ntp verify
+
+      - name: Stage backend release artifact
+        shell: bash
+        run: |
+          mkdir -p ../release/backend
+          JAR_PATH=$(find target -maxdepth 1 -type f -name "*.jar" ! -name "*-sources.jar" ! -name "*-javadoc.jar" | head -n 1)
+          if [[ -z "${JAR_PATH}" ]]; then
+            echo "No backend jar found under backend/target." >&2
+            exit 1
+          fi
+
+          cp "${JAR_PATH}" "../release/backend/stridehub-backend.jar"
+          {
+            echo "release_tag=${{ needs.release-meta.outputs.release_tag }}"
+            echo "source_sha=${GITHUB_SHA}"
+            echo "packaged_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          } > ../release/backend/manifest.txt
+
+      - name: Upload backend release bundle
+        uses: actions/upload-artifact@v5
+        with:
+          name: backend-release-bundle
+          path: |
+            release/backend/**
+          if-no-files-found: error
+          retention-days: 14
+
+  frontend-package:
+    name: Release Frontend Package
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - release-meta
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack and activate pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.28.2 --activate
+
+      - name: Resolve pnpm store directory
+        run: echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
+
+      - name: Restore pnpm store cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.PNPM_STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint frontend
+        run: pnpm --dir frontend lint
+
+      - name: Run frontend test suite with coverage
+        run: pnpm --dir frontend test:coverage
+
+      - name: Build frontend
+        run: pnpm --dir frontend build
+
+      - name: Stage frontend release artifact
+        shell: bash
+        run: |
+          mkdir -p release/frontend
+          tar -czf release/frontend/stridehub-frontend-dist.tar.gz -C frontend dist
+          {
+            echo "release_tag=${{ needs.release-meta.outputs.release_tag }}"
+            echo "source_sha=${GITHUB_SHA}"
+            echo "packaged_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          } > release/frontend/manifest.txt
+
+      - name: Upload frontend release bundle
+        uses: actions/upload-artifact@v5
+        with:
+          name: frontend-release-bundle
+          path: |
+            release/frontend/**
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - release-meta
+      - backend-package
+      - frontend-package
+    if: ${{ needs.release-meta.outputs.publish_release == 'true' }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download backend release bundle
+        uses: actions/download-artifact@v5
+        with:
+          name: backend-release-bundle
+          path: release/backend
+
+      - name: Download frontend release bundle
+        uses: actions/download-artifact@v5
+        with:
+          name: frontend-release-bundle
+          path: release/frontend
+
+      - name: Publish GitHub release assets
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ needs.release-meta.outputs.release_tag }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+            gh release upload "${RELEASE_TAG}" \
+              release/backend/stridehub-backend.jar \
+              release/backend/manifest.txt \
+              release/frontend/stridehub-frontend-dist.tar.gz \
+              release/frontend/manifest.txt \
+              --clobber
+          else
+            gh release create "${RELEASE_TAG}" \
+              release/backend/stridehub-backend.jar \
+              release/backend/manifest.txt \
+              release/frontend/stridehub-frontend-dist.tar.gz \
+              release/frontend/manifest.txt \
+              --generate-notes \
+              --title "StrideHub ${RELEASE_TAG}"
+          fi

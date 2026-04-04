@@ -299,7 +299,7 @@ This phase is complete in the current repository history. Keep it as the complet
 - [x] Remove dead code, unused properties, and stale placeholders that no longer match the baseline.
 - [x] Confirm docs do not claim more than what has actually been implemented.
 - [x] Confirm task status in this file is accurate.
-- [ ] Commit as `task 1.12: finalize phase 1 verification and cleanup`.
+- [x] Commit recorded as `task 1.12: finalize phase 1 verification and cleanup`.
 
 ### Phase 1 Exit Checklist
 

@@ -25,6 +25,7 @@
 - payment sandbox flow has been verified
 - webhook replay safety has been validated
 - operational dashboards show expected signals
+- release workflow has produced backend and frontend artifacts successfully
 
 ## 4. Deployment Readiness
 
@@ -49,3 +50,10 @@
 - issue tracker updated
 - docs updated to match shipped behavior
 - follow-up items captured
+
+## 7. Release Workflow Notes
+
+- CI and release are intentionally separate workflows.
+- CI is the merge gate for engineering correctness.
+- The release workflow packages backend and frontend artifacts and publishes a GitHub Release for version tags.
+- Tagged releases should use semantic version tags such as `v1.2.0`.

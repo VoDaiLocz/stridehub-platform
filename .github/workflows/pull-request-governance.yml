@@ -1,0 +1,161 @@
+name: pull-request-governance
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - ready_for_review
+
+permissions:
+  contents: read
+  pull-requests: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: pr-governance-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  governance:
+    name: Pull Request Governance
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+
+    steps:
+      - name: Validate PR template completion and TDD evidence
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const body = context.payload.pull_request.body || "";
+            const isDraft = context.payload.pull_request.draft;
+            const errors = [];
+
+            function escapeRegex(value) {
+              return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            }
+
+            function getSection(title) {
+              const pattern = new RegExp(`##\\s+${escapeRegex(title)}\\s*\\n([\\s\\S]*?)(?=\\n##\\s+|$)`, "i");
+              const match = body.match(pattern);
+              return match ? match[1].trim() : "";
+            }
+
+            function hasRealContent(section, placeholders = []) {
+              if (!section) {
+                return false;
+              }
+
+              const normalized = section.trim();
+              if (!normalized) {
+                return false;
+              }
+
+              return !placeholders.some((placeholder) => normalized.includes(placeholder));
+            }
+
+            const requiredSections = [
+              "Task Reference",
+              "Summary",
+              "TDD Applicability",
+              "TDD Evidence",
+              "Verification",
+              "Contract and Docs",
+              "Release Risk",
+            ];
+
+            for (const sectionName of requiredSections) {
+              if (!getSection(sectionName)) {
+                errors.push(`Missing required section: "${sectionName}".`);
+              }
+            }
+
+            const taskReference = getSection("Task Reference");
+            if (!/task\\s+\\d+\\.\\d+(?:\\.\\d+)?/i.test(taskReference)) {
+              errors.push("Task Reference must include a task identifier such as `task 2.1`.");
+            }
+
+            const summary = getSection("Summary");
+            if (!hasRealContent(summary, ["Describe the product or engineering change.", "Summarize the intended behavior and scope."])) {
+              errors.push("Summary must be filled with real scope, not template placeholder text.");
+            }
+
+            const tddApplicability = getSection("TDD Applicability");
+            const tddRequired = /- \\[x\\] TDD required for this change/i.test(tddApplicability);
+            const tddNotApplicable = /- \\[x\\] TDD not applicable/i.test(tddApplicability);
+
+            if ((tddRequired ? 1 : 0) + (tddNotApplicable ? 1 : 0) !== 1) {
+              errors.push("Exactly one TDD applicability option must be checked.");
+            }
+
+            const tddEvidence = getSection("TDD Evidence");
+            const redCommandMatch = tddEvidence.match(/RED command:\\s*`([^`]+)`/i);
+            const redResultMatch = tddEvidence.match(/RED result:\\s*(.+)/i);
+            const greenCommandMatch = tddEvidence.match(/GREEN command\\(s\\):\\s*`([^`]+)`/i);
+            const notApplicableReasonMatch = tddEvidence.match(/Reason not applicable:\\s*(.+)/i);
+
+            const invalidValues = /^(?:n\\/a|none|tbd|same as above|placeholder)$/i;
+
+            if (tddRequired) {
+              if (!redCommandMatch || invalidValues.test(redCommandMatch[1].trim())) {
+                errors.push("TDD-required PRs must document a real RED command.");
+              }
+
+              if (!redResultMatch || invalidValues.test(redResultMatch[1].trim())) {
+                errors.push("TDD-required PRs must document the expected failing RED result.");
+              }
+
+              if (!greenCommandMatch || invalidValues.test(greenCommandMatch[1].trim())) {
+                errors.push("TDD-required PRs must document real GREEN verification commands.");
+              }
+            }
+
+            if (tddNotApplicable) {
+              if (!notApplicableReasonMatch || invalidValues.test(notApplicableReasonMatch[1].trim())) {
+                errors.push("If TDD is marked not applicable, a concrete reason is required.");
+              }
+            }
+
+            const verification = getSection("Verification");
+            if (!hasRealContent(verification, ["Paste the exact commands and outcomes you ran locally."])) {
+              errors.push("Verification must include real local commands or outcomes.");
+            }
+
+            const contractAndDocs = getSection("Contract and Docs");
+            if (!hasRealContent(contractAndDocs, ["Note OpenAPI, docs, runbooks, or ADR impacts."])) {
+              errors.push("Contract and Docs must be completed.");
+            }
+
+            const releaseRisk = getSection("Release Risk");
+            if (!hasRealContent(releaseRisk, ["Capture migration, auth, payment, inventory, rollback, or operational risk."])) {
+              errors.push("Release Risk must be completed.");
+            }
+
+            if (isDraft) {
+              core.summary.addHeading("Pull Request Governance");
+              core.summary.addRaw("Draft pull request detected. Governance validation still ran so the author can see gaps early.");
+              await core.summary.write();
+            }
+
+            if (errors.length > 0) {
+              core.summary.addHeading("Pull Request Governance Failures");
+              for (const error of errors) {
+                core.summary.addList([error]);
+              }
+              await core.summary.write();
+              core.setFailed(errors.join("\n"));
+              return;
+            }
+
+            core.summary
+              .addHeading("Pull Request Governance")
+              .addRaw("PR template, task traceability, TDD applicability, and verification evidence are present.")
+            await core.summary.write();

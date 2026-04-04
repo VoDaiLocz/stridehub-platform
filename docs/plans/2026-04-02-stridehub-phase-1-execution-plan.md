@@ -966,7 +966,7 @@ pnpm --dir frontend build
 
 **Commit Message:**
 
-`task 1.12: finalize and verify phase 1 marketplace backend`
+`task 1.12: finalize phase 1 verification and cleanup`
 
 ## Definition of Done for This Plan
 
@@ -1011,6 +1011,6 @@ Starting from the current repository baseline, apply commits in roughly this ord
 9. `task 1.9: add audit logging and outbox persistence foundation`
 10. `task 1.10: align openapi contract with implemented phase 1 endpoints`
 11. `task 1.11: add ci and operational delivery baseline`
-12. `task 1.12: finalize and verify phase 1 marketplace backend`
+12. `task 1.12: finalize phase 1 verification and cleanup`
 
 

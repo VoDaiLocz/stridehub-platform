@@ -11,6 +11,18 @@ The most critical risks are:
 - broken order state transitions
 - authorization leaks between buyer, seller, and admin roles
 
+## 1.1 TDD Delivery Rule
+
+StrideHub should follow a test-first delivery loop for behavior changes:
+
+1. write or update the smallest failing automated test first
+2. run the narrowest command that proves the test fails for the expected reason
+3. implement the minimum code to pass
+4. rerun the targeted command
+5. rerun broader repository verification before commit or PR update
+
+The authoritative repository guidance for this workflow lives in [TDD Engineering Workflow](./tdd-engineering-workflow.md).
+
 ## 2. Test Pyramid
 
 ### Unit Tests
@@ -107,6 +119,7 @@ Current baseline:
 - no release without migration verification
 - no payment-related change without webhook replay tests
 - no authorization change without role coverage tests
+- no completion claim without fresh verification evidence
 
 ## 6. Recommended Tooling
 

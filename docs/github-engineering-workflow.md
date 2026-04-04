@@ -8,8 +8,25 @@ The operating principles are:
 
 - every change should be traceable to a task in the execution plans
 - every pull request should carry verification evidence
+- every production-code pull request should carry TDD applicability and RED/GREEN evidence
 - `main` should remain releasable
 - CI should produce actionable artifacts, not just red or green badges
+
+## 1.1 Workflow Layers
+
+StrideHub uses four layers that serve different purposes:
+
+1. local TDD workflow
+2. pull-request governance
+3. CI verification
+4. release packaging and publication
+
+These layers are intentionally separate.
+
+- TDD defines how the engineer builds the change.
+- Pull-request governance verifies that the engineer documented evidence for that process.
+- CI reruns repository verification independently.
+- Release packages and publishes from a green revision or version tag.
 
 ## 2. Branching Model
 
@@ -52,16 +69,19 @@ Each pull request should include:
 
 - a concise summary
 - the linked task number
+- an explicit TDD applicability choice
+- RED/GREEN evidence when TDD applies
 - exact verification commands run locally
 - note of any API, migration, or operational impact
 - rollback awareness for risky changes
 
-The repository PR template is designed to enforce this baseline.
+The repository PR template and pull-request governance workflow are designed to enforce this baseline.
 
 ## 5. Required GitHub Checks
 
 The repository CI baseline should require the following checks before merge:
 
+- `Pull Request Governance`
 - `Backend Verification`
 - `Frontend Verification`
 - `Quality Gate`
@@ -108,6 +128,22 @@ Its role is to:
 - fail if either verification job fails
 - provide a single required check for branch protection
 
+## 7. Pull Request Governance
+
+The repository uses a dedicated pull-request governance workflow to validate the PR body.
+
+It checks for:
+
+- task traceability
+- TDD applicability choice
+- RED/GREEN evidence for production-code work
+- local verification evidence
+- contract/docs impact notes
+- release-risk notes
+
+This workflow does not prove that the engineer truly followed TDD.
+It proves that the engineer supplied reviewable evidence.
+
 ## 7. CI Artifacts
 
 Artifacts should be treated as part of the engineering workflow, not as optional extras.
@@ -124,7 +160,21 @@ Artifacts are useful for:
 - investigating flaky tests
 - preserving evidence for review
 
-## 8. Dependency Review
+## 8. Release Workflow
+
+Release packaging is intentionally separate from CI.
+
+The release workflow:
+
+- reruns backend verification before packaging
+- reruns frontend lint, test coverage, and production build
+- packages the backend jar and frontend distributable
+- uploads release artifacts
+- publishes a GitHub Release when triggered from a version tag or manual publish request
+
+This prevents the CI workflow from becoming a release pipeline and keeps merge verification separate from distribution concerns.
+
+## 9. Dependency Review
 
 Pull requests should automatically review dependency changes.
 
@@ -136,7 +186,7 @@ This helps surface:
 
 The dependency-review workflow is intentionally lightweight and should run on every PR into `main`.
 
-## 9. When CI Fails
+## 10. When CI Fails
 
 The engineer responsible for the change should:
 
@@ -152,7 +202,19 @@ If the failure is remote-only:
 - inspect artifact output
 - avoid merging on the assumption that the failure is transient
 
-## 10. Release Readiness Relationship
+## 11. TDD Relationship
+
+True TDD cannot be fully enforced by GitHub Actions because the platform cannot observe whether the test was written first.
+
+What the repository can enforce is:
+
+- the presence of written TDD evidence in the PR
+- fresh automated verification in CI
+- release packaging only after green verification
+
+The detailed repository rule set for TDD lives in [TDD Engineering Workflow](./tdd-engineering-workflow.md).
+
+## 12. Release Readiness Relationship
 
 CI passing is necessary but not sufficient for release.
 
