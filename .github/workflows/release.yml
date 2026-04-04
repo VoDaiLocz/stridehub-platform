@@ -200,11 +200,13 @@ jobs:
       - name: Publish GitHub release assets
         shell: bash
         env:
+          GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ needs.release-meta.outputs.release_tag }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if gh release view "${RELEASE_TAG}" >/dev/null 2>&1; then
+          if gh release view "${RELEASE_TAG}" --repo "${GH_REPO}" >/dev/null 2>&1; then
             gh release upload "${RELEASE_TAG}" \
+              --repo "${GH_REPO}" \
               release/backend/stridehub-backend.jar \
               release/backend/manifest.txt \
               release/frontend/stridehub-frontend-dist.tar.gz \
@@ -212,6 +214,7 @@ jobs:
               --clobber
           else
             gh release create "${RELEASE_TAG}" \
+              --repo "${GH_REPO}" \
               release/backend/stridehub-backend.jar \
               release/backend/manifest.txt \
               release/frontend/stridehub-frontend-dist.tar.gz \
