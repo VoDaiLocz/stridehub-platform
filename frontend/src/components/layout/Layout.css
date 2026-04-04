@@ -1,0 +1,25 @@
+.layout-root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  padding-top: 0;
+}
+
+.footer-site {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 4rem 0 2rem;
+  margin-top: auto;
+  text-align: center;
+}
+
+.copyright {
+  opacity: 0.5;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

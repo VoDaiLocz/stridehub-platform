@@ -36,3 +36,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### StrideHub Props ###
+docs/screenshots/
+.playwright-mcp/

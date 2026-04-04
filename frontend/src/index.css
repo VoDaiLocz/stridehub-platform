@@ -1,43 +1,89 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap');
 
 :root {
-  font-family: 'Manrope', sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-  color: #24384f;
-  background:
-    radial-gradient(circle at top left, rgba(197, 226, 255, 0.6), transparent 28%),
-    linear-gradient(180deg, #f5f1e8 0%, #fbfaf7 100%);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Design Tokens - Vessi */
+  --primary: #0069F0;
+  --primary-dark: #0056C4;
+  --secondary: #000000;
+  --accent: #EBF3FF;
+  
+  --text-main: #000000;
+  --text-muted: #666666;
+  --white: #ffffff;
+  --bg-main: #ffffff;
+  --bg-secondary: #f7f7f7;
+  
+  --header-height: 80px;
+  --header-height-mobile: 64px;
+  --announcement-height: 36px;
+  
+  --card-radius: 12px;
+  --btn-radius: 9999px;
+  
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-blur: blur(14px);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  
+  /* Motion Tokens */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 body {
-  margin: 0;
-  min-width: 320px;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
+  background-color: var(--bg-main);
+  line-height: 1.5;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-#root {
-  min-height: 100vh;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
-h1,
-h2,
-h3 {
-  font-family: 'Cormorant Garamond', serif;
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease;
 }
 
-a,
 button {
+  cursor: pointer;
+  border: none;
+  background: none;
   font: inherit;
+}
+
+/* Global Utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+}
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
 }
