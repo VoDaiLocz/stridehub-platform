@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.stridehub.common.exception.ConflictException;
 import com.stridehub.inventory.domain.InventoryReservation;
 import com.stridehub.inventory.domain.InventoryReservationStatus;
+import com.stridehub.support.TestDatabaseCleaner;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
@@ -37,26 +38,7 @@ class InventoryServiceIntegrationTest {
     @BeforeEach
     void setUp() {
         executorService = Executors.newFixedThreadPool(2);
-        jdbcTemplate.execute("delete from inventory_reservations");
-        jdbcTemplate.execute("delete from refunds");
-        jdbcTemplate.execute("delete from order_items");
-        jdbcTemplate.execute("delete from shipments");
-        jdbcTemplate.execute("delete from orders");
-        jdbcTemplate.execute("delete from payment_attempts");
-        jdbcTemplate.execute("delete from payments");
-        jdbcTemplate.execute("delete from checkout_sessions");
-        jdbcTemplate.execute("delete from cart_items");
-        jdbcTemplate.execute("delete from carts");
-        jdbcTemplate.execute("delete from inventory_items");
-        jdbcTemplate.execute("delete from product_images");
-        jdbcTemplate.execute("delete from product_variants");
-        jdbcTemplate.execute("delete from products");
-        jdbcTemplate.execute("delete from categories");
-        jdbcTemplate.execute("delete from brands");
-        jdbcTemplate.execute("delete from refresh_tokens");
-        jdbcTemplate.execute("delete from addresses");
-        jdbcTemplate.execute("delete from user_roles");
-        jdbcTemplate.execute("delete from users");
+        TestDatabaseCleaner.reset(jdbcTemplate);
     }
 
     @AfterEach

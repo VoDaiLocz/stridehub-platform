@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.stridehub.support.TestDatabaseCleaner;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
@@ -30,12 +31,7 @@ class CatalogControllerIntegrationTest {
 
     @BeforeEach
     void resetCatalogData() {
-        jdbcTemplate.execute("delete from inventory_items");
-        jdbcTemplate.execute("delete from product_images");
-        jdbcTemplate.execute("delete from product_variants");
-        jdbcTemplate.execute("delete from products");
-        jdbcTemplate.execute("delete from categories");
-        jdbcTemplate.execute("delete from brands");
+        TestDatabaseCleaner.reset(jdbcTemplate);
     }
 
     @Test

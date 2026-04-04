@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.stridehub.support.TestDatabaseCleaner;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,27 +37,7 @@ class IdentityControllerIntegrationTest {
 
     @BeforeEach
     void resetDatabase() {
-        jdbcTemplate.execute("delete from inventory_reservations");
-        jdbcTemplate.execute("delete from refunds");
-        jdbcTemplate.execute("delete from reviews");
-        jdbcTemplate.execute("delete from wishlist_items");
-        jdbcTemplate.execute("delete from notifications");
-        jdbcTemplate.execute("delete from audit_logs");
-        jdbcTemplate.execute("delete from outbox_events");
-        jdbcTemplate.execute("delete from order_items");
-        jdbcTemplate.execute("delete from shipments");
-        jdbcTemplate.execute("delete from orders");
-        jdbcTemplate.execute("delete from payment_attempts");
-        jdbcTemplate.execute("delete from payments");
-        jdbcTemplate.execute("delete from checkout_sessions");
-        jdbcTemplate.execute("delete from cart_items");
-        jdbcTemplate.execute("delete from carts");
-        jdbcTemplate.execute("delete from seller_profiles");
-        jdbcTemplate.execute("delete from seller_applications");
-        jdbcTemplate.execute("delete from refresh_tokens");
-        jdbcTemplate.execute("delete from addresses");
-        jdbcTemplate.execute("delete from user_roles");
-        jdbcTemplate.execute("delete from users");
+        TestDatabaseCleaner.reset(jdbcTemplate);
     }
 
     @Test
