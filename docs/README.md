@@ -23,9 +23,9 @@ StrideHub is a production-style `multi-vendor footwear marketplace` delivered as
 
 1. `prd.md`
 2. `audits/2026-04-02-baseline-consistency-audit.md`
-3. `plans/2026-04-02-stridehub-enterprise-plan.md`
-4. `plans/2026-04-02-stridehub-full-production-execution-plan.md`
-5. `plans/2026-04-02-stridehub-phase-1-execution-plan.md`
+3. `plans/2026-04-02-stridehub-full-production-execution-plan.md`
+4. `plans/2026-04-02-stridehub-phase-1-execution-plan.md`
+5. `plans/2026-04-02-stridehub-enterprise-plan.md`
 6. `architecture.md`
 7. `domain-model.md`
 8. `api/openapi.yaml`
@@ -43,6 +43,8 @@ This repository currently combines two documentation modes:
 ### Implemented Baseline
 
 - Program 0 engineering foundation
+- Program 1 backend commerce core through seller application and audit/outbox baseline
+- Program 1 buyer-facing frontend companion baseline for auth, catalog, checkout shell, and order views
 - monorepo repository split with `backend/` and `frontend/`
 - runtime configuration and environment setup
 - baseline schema migrations
@@ -66,10 +68,12 @@ This repository currently combines two documentation modes:
 - Catalog and product variants
 - Inventory and reservation model
 - Cart and checkout
+- Buyer companion screens for auth, catalog browsing, product detail, checkout shell, and order history
 - External payment gateway integration pattern
 - Payment webhook processing
 - Order confirmation
-- Admin bootstrap capabilities
+- Seller application baseline
+- Audit and outbox persistence baseline
 
 ### Phase 2
 
@@ -102,3 +106,4 @@ This repository currently combines two documentation modes:
 - API documentation follows an OpenAPI-first approach.
 - Commit history is expected to follow plan-linked numbering such as `task 0.6: ...` or `task 1.1.2: ...` so implementation remains traceable to execution plans.
 - Files under `plans/` describe intended delivery order; they are not claims that every item is already implemented.
+- The enterprise plan remains useful for product framing, but the full execution plan, phase checklist, and task dashboard are the canonical sources for current implementation order.

@@ -10,12 +10,13 @@ StrideHub is a production-style multi-vendor footwear marketplace organized as a
 - `.github/` CI workflows
 - `docker-compose.yml` shared local infrastructure for backend dependencies
 
-## Implemented Foundation
+## Implemented Baseline
 
 The repository now includes:
 
 - a backend Program 0 foundation with config profiles, security baseline, Flyway schema, tests, and CI coverage
-- a frontend buyer web shell prepared for a premium Vessi-inspired direction
+- a backend Phase 1 commerce core with identity, catalog, inventory, cart, checkout, payment, order, seller-application, and audit/outbox baseline modules
+- a frontend buyer Phase 1 companion baseline with auth screens, collection browsing, product detail, checkout shell, and buyer order pages
 - monorepo root orchestration for docs, compose, workspace dependencies, and delivery flow
 
 ## Quick Start
@@ -42,10 +43,13 @@ The repository now includes:
    .\backend\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
    ```
 
+   The local profile auto-loads a small catalog and inventory seed so buyer catalog pages have live data on first boot.
+
 4. Verify backend endpoints:
 
 - `GET http://localhost:8080/actuator/health`
 - `GET http://localhost:8080/v3/api-docs`
+- `GET http://localhost:8080/api/v1/system/ping` with a valid bearer token
 
 ### Frontend
 
@@ -62,6 +66,17 @@ The repository now includes:
    pnpm --dir frontend dev
    ```
 
+4. Phase 1 buyer routes available in the frontend:
+
+- `/`
+- `/collections/women`
+- `/collections/men`
+- `/products/{slug}`
+- `/auth/login`
+- `/auth/register`
+- `/checkout`
+- `/account/orders`
+
 ### Verification
 
 ```powershell
@@ -76,7 +91,7 @@ pnpm --dir frontend build
 
 This repository contains both:
 
-- implemented foundation docs for the current backend/frontend baseline
+- implemented baseline docs for the current backend/frontend baseline
 - forward-looking product, architecture, UI, and execution plans for later phases
 
 ## Documentation

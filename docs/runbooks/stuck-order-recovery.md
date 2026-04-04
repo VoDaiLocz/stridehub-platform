@@ -1,5 +1,9 @@
 # Runbook: Stuck Order Recovery
 
+> Phase note: treat this as a target-state guide. Phase 1 already has order confirmation,
+> reservation commit, and audit/outbox baseline behavior, but not the full operational tooling
+> assumed by every step below.
+
 ## Symptoms
 
 - order remains in an intermediate state longer than expected

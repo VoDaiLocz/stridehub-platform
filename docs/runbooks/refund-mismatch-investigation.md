@@ -1,5 +1,8 @@
 # Runbook: Refund Mismatch Investigation
 
+> Phase note: this runbook is primarily a Program 3 reference. Refund workflows are not part
+> of the implemented Phase 1 baseline yet.
+
 ## Symptoms
 
 - local refund shows completed but provider dashboard disagrees

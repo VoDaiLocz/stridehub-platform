@@ -1,5 +1,9 @@
 # Runbook: Payment Webhook Failure
 
+> Phase note: this runbook is partially applicable in the current Phase 1 backend because
+> signed webhook processing already exists, but later-phase tooling such as richer dashboards
+> and replay controls may still be missing.
+
 ## Symptoms
 
 - orders remain in `PENDING_PAYMENT`
