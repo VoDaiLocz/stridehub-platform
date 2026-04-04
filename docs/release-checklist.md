@@ -14,6 +14,8 @@
 - migrations reviewed
 - API contract changes documented
 - ADR added if architecture changed materially
+- CI required checks are green (`Backend Verification`, `Frontend Verification`, `Quality Gate`)
+- dependency review is green for PRs that touch dependency manifests
 
 ## 3. Pre-Release Validation
 

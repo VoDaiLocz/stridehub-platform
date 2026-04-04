@@ -7,23 +7,23 @@ on:
   pull_request:
     branches:
       - main
+  merge_group:
   workflow_dispatch:
 
 permissions:
   contents: read
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   backend:
     name: Backend Verification
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
+    permissions:
+      contents: read
 
     defaults:
       run:
@@ -43,25 +43,50 @@ jobs:
       - name: Ensure Maven wrapper is executable
         run: chmod +x mvnw
 
-      - name: Run test suite
-        run: ./mvnw -B test
+      - name: Verify backend quality gates
+        run: ./mvnw -B -ntp verify
 
-      - name: Verify compilation
-        run: ./mvnw -B -DskipTests compile
+      - name: Upload backend test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            backend/target/surefire-reports/**
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Upload backend coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jacoco-report
+          path: |
+            backend/target/site/jacoco/**
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Summarize backend verification
+        if: always()
+        run: |
+          {
+            echo "### Backend Verification"
+            echo
+            echo "- Maven verify completed for the Spring Boot backend."
+            echo "- Surefire reports are uploaded as the \`backend-test-reports\` artifact."
+            echo "- JaCoCo HTML coverage is uploaded as the \`backend-jacoco-report\` artifact."
+          } >> "$GITHUB_STEP_SUMMARY"
 
   frontend:
     name: Frontend Verification
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v5
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.28.2
 
       - name: Set up Node.js 22
         uses: actions/setup-node@v6
@@ -70,14 +95,58 @@ jobs:
           cache: pnpm
           cache-dependency-path: pnpm-lock.yaml
 
+      - name: Enable Corepack and activate pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.28.2 --activate
+
       - name: Install workspace dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Lint frontend
         run: pnpm --dir frontend lint
 
-      - name: Run frontend test suite
-        run: pnpm --dir frontend test --run
+      - name: Run frontend test suite with coverage
+        run: pnpm --dir frontend test:coverage
 
       - name: Build frontend
         run: pnpm --dir frontend build
+
+      - name: Upload frontend coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-report
+          path: |
+            frontend/coverage/**
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Summarize frontend verification
+        if: always()
+        run: |
+          {
+            echo "### Frontend Verification"
+            echo
+            echo "- ESLint, Vitest coverage, and production build completed for the buyer web."
+            echo "- Frontend coverage artifacts are uploaded as \`frontend-coverage-report\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    if: always()
+    needs:
+      - backend
+      - frontend
+    permissions:
+      contents: read
+
+    steps:
+      - name: Enforce required verification jobs
+        run: |
+          echo "Backend result: ${{ needs.backend.result }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "Frontend result: ${{ needs.frontend.result }}" >> "$GITHUB_STEP_SUMMARY"
+
+          test "${{ needs.backend.result }}" = "success"
+          test "${{ needs.frontend.result }}" = "success"

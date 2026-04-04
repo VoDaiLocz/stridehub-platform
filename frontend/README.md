@@ -46,6 +46,6 @@ The buyer shell now includes:
 
 ```powershell
 pnpm --dir frontend lint
-pnpm --dir frontend test --run
+pnpm --dir frontend test:coverage
 pnpm --dir frontend build
 ```

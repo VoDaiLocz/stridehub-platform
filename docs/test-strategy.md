@@ -68,11 +68,12 @@ Focus:
 
 Current baseline:
 
-- The current GitHub Actions workflow verifies backend compile and backend tests against the `test` profile.
-- The current GitHub Actions workflow also verifies frontend lint, frontend tests, and frontend production build.
+- The current GitHub Actions workflow verifies backend quality gates through `mvn verify` against the `test` profile.
+- The current GitHub Actions workflow also verifies frontend lint, frontend coverage tests, and frontend production build.
 - The `test` profile uses H2 in PostgreSQL compatibility mode to keep Program 0 verification deterministic and independent of Docker.
 - PostgreSQL and Redis container-backed tests remain planned for later database-sensitive modules.
 - The current Phase 1 baseline includes automated coverage for identity, catalog, cart, checkout, payment, order, seller-application, and audit/outbox flows.
+- CI uploads backend surefire reports, backend JaCoCo coverage, and frontend coverage artifacts for remote debugging and review.
 
 ### Pre-Release / Staging
 

@@ -80,10 +80,9 @@ The repository now includes:
 ### Verification
 
 ```powershell
-.\backend\mvnw.cmd test
-.\backend\mvnw.cmd -q -DskipTests compile
+.\backend\mvnw.cmd -q verify
 pnpm --dir frontend lint
-pnpm --dir frontend test --run
+pnpm --dir frontend test:coverage
 pnpm --dir frontend build
 ```
 
@@ -99,6 +98,7 @@ This repository contains both:
 - [Documentation Index](./docs/README.md)
 - [Master Task Checklist](./TASK-CHECKLIST.md)
 - [Execution Checklist and Progress Tracker](./PROGRESS.md)
+- [GitHub Engineering Workflow](./docs/github-engineering-workflow.md)
 - [Backend Workspace Guide](./backend/README.md)
 - [Frontend Workspace Guide](./frontend/README.md)
 

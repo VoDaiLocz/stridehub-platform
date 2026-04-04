@@ -13,6 +13,7 @@ StrideHub is a production-style `multi-vendor footwear marketplace` delivered as
 - [Architecture](./architecture.md)
 - [Domain Model](./domain-model.md)
 - [OpenAPI Specification](./api/openapi.yaml)
+- [GitHub Engineering Workflow](./github-engineering-workflow.md)
 - [Test Strategy](./test-strategy.md)
 - [Release Checklist](./release-checklist.md)
 - [Baseline Consistency Audit](./audits/2026-04-02-baseline-consistency-audit.md)
@@ -29,9 +30,10 @@ StrideHub is a production-style `multi-vendor footwear marketplace` delivered as
 6. `architecture.md`
 7. `domain-model.md`
 8. `api/openapi.yaml`
-9. `test-strategy.md`
-10. `runbooks/*`
-11. `adr/*`
+9. `github-engineering-workflow.md`
+10. `test-strategy.md`
+11. `runbooks/*`
+12. `adr/*`
 
 ## Scope of This Documentation Set
 
@@ -50,6 +52,7 @@ This repository currently combines two documentation modes:
 - baseline schema migrations
 - security and request-correlation foundation
 - CI build verification
+- PR template and dependency review workflow
 
 ### Target-State Planning
 

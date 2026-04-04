@@ -49,6 +49,5 @@ The implemented backend baseline now covers:
 ## Verification
 
 ```powershell
-.\mvnw.cmd test
-.\mvnw.cmd -q -DskipTests compile
+.\mvnw.cmd -q verify
 ```
