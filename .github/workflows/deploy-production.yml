@@ -113,6 +113,11 @@ jobs:
         with:
           node-version: '22'
 
+      - name: Enable Corepack and activate pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.28.2 --activate
+
       - name: Validate deployment secrets
         run: |
           test -n "${RENDER_DEPLOY_HOOK_URL}" || (echo "::error::Missing RENDER_DEPLOY_HOOK_URL secret." && exit 1)
