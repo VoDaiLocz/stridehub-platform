@@ -152,7 +152,7 @@ jobs:
         if: steps.backend-config.outputs.configured == 'true'
         run: |
           for attempt in $(seq 1 30); do
-            if curl --fail --show-error --silent --location "${BACKEND_HEALTH_URL}" >/tmp/backend-health.json; then
+            if curl --fail --show-error --silent --location --max-time 20 "${BACKEND_HEALTH_URL}" >/tmp/backend-health.json; then
               echo "Backend health check passed on attempt ${attempt}."
               cat /tmp/backend-health.json
               exit 0
