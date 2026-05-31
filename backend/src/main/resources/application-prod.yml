@@ -39,3 +39,6 @@ management:
 stridehub:
   web:
     allowed-origins: ${STRIDEHUB_WEB_ALLOWED_ORIGINS}
+
+server:
+  port: ${PORT:8080}
