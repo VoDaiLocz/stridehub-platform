@@ -14,6 +14,14 @@ spring:
   sql:
     init:
       mode: never
+  flyway:
+    schemas: ${STRIDEHUB_DB_SCHEMA:stridehub}
+    default-schema: ${STRIDEHUB_DB_SCHEMA:stridehub}
+    create-schemas: true
+  jpa:
+    properties:
+      hibernate:
+        default_schema: ${STRIDEHUB_DB_SCHEMA:stridehub}
   data:
     redis:
       host: ${STRIDEHUB_REDIS_HOST:localhost}
