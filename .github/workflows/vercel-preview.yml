@@ -111,21 +111,35 @@ jobs:
           node-version: '22'
 
       - name: Validate Vercel secrets
+        id: vercel-secrets
         run: |
-          test -n "${VERCEL_TOKEN}" || (echo "::error::Missing VERCEL_TOKEN secret." && exit 1)
-          test -n "${VERCEL_ORG_ID}" || (echo "::error::Missing VERCEL_ORG_ID secret." && exit 1)
-          test -n "${VERCEL_PROJECT_ID}" || (echo "::error::Missing VERCEL_PROJECT_ID secret." && exit 1)
+          if [[ -n "${VERCEL_TOKEN}" && -n "${VERCEL_ORG_ID}" && -n "${VERCEL_PROJECT_ID}" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "configured=false" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Vercel Preview Deployment"
+            echo
+            echo "Preview deployment skipped because one or more Vercel secrets are not configured."
+            echo "Required secrets: \`VERCEL_TOKEN\`, \`VERCEL_ORG_ID\`, \`VERCEL_PROJECT_ID\`."
+          } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Install Vercel CLI
+        if: ${{ steps.vercel-secrets.outputs.configured == 'true' }}
         run: npm install --global vercel@latest
 
       - name: Pull Vercel preview settings
+        if: ${{ steps.vercel-secrets.outputs.configured == 'true' }}
         run: vercel pull --yes --environment=preview --token="${VERCEL_TOKEN}"
 
       - name: Build Vercel preview artifact
+        if: ${{ steps.vercel-secrets.outputs.configured == 'true' }}
         run: vercel build --token="${VERCEL_TOKEN}"
 
       - name: Deploy Vercel preview
+        if: ${{ steps.vercel-secrets.outputs.configured == 'true' }}
         id: deploy
         run: |
           deployment_url="$(vercel deploy --prebuilt --archive=tgz --token="${VERCEL_TOKEN}")"

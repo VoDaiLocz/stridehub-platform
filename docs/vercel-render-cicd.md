@@ -48,6 +48,8 @@ Set Vercel environment variables:
 
 If using GitHub Actions as the deployment controller, disable Vercel Git auto-deploys for the project to avoid duplicate deploys.
 
+Until `VERCEL_TOKEN` is configured, the preview workflow still runs backend and frontend gates but skips the Vercel Preview deploy step with a summary message.
+
 ## Render Setup
 
 Use `render.yaml` as the service blueprint or create the service manually with equivalent settings:
