@@ -41,6 +41,8 @@ spring:
 
 management:
   health:
+    mail:
+      enabled: ${STRIDEHUB_MAIL_HEALTH_ENABLED:false}
     redis:
       enabled: ${STRIDEHUB_REDIS_HEALTH_ENABLED:false}
 
