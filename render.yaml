@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: stridehub-backend
+    runtime: docker
+    plan: free
+    rootDir: backend
+    dockerfilePath: backend/Dockerfile
+    dockerContext: backend
+    healthCheckPath: /actuator/health
+    autoDeployTrigger: off
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: STRIDEHUB_DB_URL
+        sync: false
+      - key: STRIDEHUB_DB_USERNAME
+        sync: false
+      - key: STRIDEHUB_DB_PASSWORD
+        sync: false
+      - key: STRIDEHUB_JWT_SECRET
+        sync: false
+      - key: STRIDEHUB_WEB_ALLOWED_ORIGINS
+        sync: false
+      - key: STRIDEHUB_PAYMENT_WEBHOOK_SECRET
+        sync: false
+      - key: STRIDEHUB_REDIS_HOST
+        sync: false
+      - key: STRIDEHUB_REDIS_PORT
+        sync: false
+      - key: STRIDEHUB_REDIS_HEALTH_ENABLED
+        value: "false"

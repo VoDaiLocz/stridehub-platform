@@ -1,0 +1,223 @@
+name: deploy-production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  backend-quality:
+    name: Backend Production Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Temurin JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Ensure Maven wrapper is executable
+        run: chmod +x mvnw
+
+      - name: Verify backend quality gates
+        run: ./mvnw -B -ntp verify
+
+  frontend-quality:
+    name: Frontend Production Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack and activate pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.28.2 --activate
+
+      - name: Resolve pnpm store directory
+        run: echo "PNPM_STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_ENV"
+
+      - name: Restore pnpm store cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.PNPM_STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install workspace dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint frontend
+        run: pnpm --dir frontend lint
+
+      - name: Run frontend test suite with coverage
+        run: pnpm --dir frontend test:coverage
+
+      - name: Build frontend
+        run: pnpm --dir frontend build
+
+  deploy-backend:
+    name: Deploy Backend (Optional)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs:
+      - backend-quality
+    outputs:
+      status: ${{ steps.backend-result.outputs.status || steps.backend-config.outputs.status }}
+    env:
+      BACKEND_HEALTH_URL: ${{ secrets.BACKEND_HEALTH_URL }}
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      RENDER_STABILIZATION_SECONDS: ${{ vars.RENDER_STABILIZATION_SECONDS || '90' }}
+
+    steps:
+      - name: Determine Render deployment configuration
+        id: backend-config
+        run: |
+          if [[ -n "${RENDER_DEPLOY_HOOK_URL}" && -n "${BACKEND_HEALTH_URL}" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "status=configured" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "configured=false" >> "$GITHUB_OUTPUT"
+          echo "status=skipped" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Backend Deployment"
+            echo
+            echo "Render backend deployment skipped because backend deploy secrets are not configured."
+            echo "Required secrets: \`RENDER_DEPLOY_HOOK_URL\`, \`BACKEND_HEALTH_URL\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Trigger Render backend deploy
+        if: steps.backend-config.outputs.configured == 'true'
+        run: |
+          curl --fail --show-error --silent --request POST "${RENDER_DEPLOY_HOOK_URL}" >/dev/null
+          echo "Render backend deployment triggered."
+
+      - name: Wait before backend health polling
+        if: steps.backend-config.outputs.configured == 'true'
+        run: sleep "${RENDER_STABILIZATION_SECONDS}"
+
+      - name: Verify backend health
+        if: steps.backend-config.outputs.configured == 'true'
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --show-error --silent --location "${BACKEND_HEALTH_URL}" >/tmp/backend-health.json; then
+              echo "Backend health check passed on attempt ${attempt}."
+              cat /tmp/backend-health.json
+              exit 0
+            fi
+
+            echo "Backend health check attempt ${attempt} failed; retrying in 10 seconds."
+            sleep 10
+          done
+
+          echo "::error::Backend health check did not pass before timeout."
+          exit 1
+
+      - name: Record backend deployment result
+        id: backend-result
+        if: steps.backend-config.outputs.configured == 'true'
+        run: |
+          echo "status=deployed" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Backend Deployment"
+            echo
+            echo "- Status: deployed"
+            echo "- Source: ${GITHUB_SHA}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-production:
+    name: Deploy Vercel Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs:
+      - frontend-quality
+      - deploy-backend
+    environment:
+      name: production
+      url: ${{ steps.vercel-deploy.outputs.url }}
+    env:
+      BACKEND_DEPLOY_STATUS: ${{ needs.deploy-backend.outputs.status }}
+      FRONTEND_PRODUCTION_URL: ${{ secrets.FRONTEND_PRODUCTION_URL }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack and activate pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.28.2 --activate
+
+      - name: Validate Vercel deployment secrets
+        run: |
+          test -n "${VERCEL_TOKEN}" || (echo "::error::Missing VERCEL_TOKEN secret." && exit 1)
+          test -n "${VERCEL_ORG_ID}" || (echo "::error::Missing VERCEL_ORG_ID secret." && exit 1)
+          test -n "${VERCEL_PROJECT_ID}" || (echo "::error::Missing VERCEL_PROJECT_ID secret." && exit 1)
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel production settings
+        run: vercel pull --yes --environment=production --token="${VERCEL_TOKEN}"
+
+      - name: Build Vercel production artifact
+        run: vercel build --prod --token="${VERCEL_TOKEN}"
+
+      - name: Deploy Vercel production
+        id: vercel-deploy
+        run: |
+          deployment_url="$(vercel deploy --prebuilt --prod --archive=tgz --token="${VERCEL_TOKEN}")"
+          echo "url=${deployment_url}" >> "$GITHUB_OUTPUT"
+          echo "VERCEL_DEPLOYMENT_URL=${deployment_url}" >> "$GITHUB_ENV"
+
+      - name: Smoke check frontend
+        run: |
+          frontend_url="${FRONTEND_PRODUCTION_URL:-${VERCEL_DEPLOYMENT_URL}}"
+          curl --fail --show-error --silent --location "${frontend_url}" >/tmp/frontend.html
+          grep -qi "<html" /tmp/frontend.html
+          {
+            echo "### Production Deployment"
+            echo
+            echo "- Backend deploy: ${BACKEND_DEPLOY_STATUS}"
+            echo "- Frontend URL: ${frontend_url}"
+            echo "- Source: ${GITHUB_SHA}"
+          } >> "$GITHUB_STEP_SUMMARY"

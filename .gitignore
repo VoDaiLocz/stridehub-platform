@@ -41,3 +41,4 @@ build/
 ### StrideHub Props ###
 docs/screenshots/
 .playwright-mcp/
+.vercel

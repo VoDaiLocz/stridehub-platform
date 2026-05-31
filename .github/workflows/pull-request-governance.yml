@@ -79,7 +79,7 @@ jobs:
             }
 
             const taskReference = getSection("Task Reference");
-            if (!/task\\s+\\d+\\.\\d+(?:\\.\\d+)?/i.test(taskReference)) {
+            if (!/task\s+\d+\.\d+(?:\.\d+)?/i.test(taskReference)) {
               errors.push("Task Reference must include a task identifier such as `task 2.1`.");
             }
 
@@ -89,20 +89,20 @@ jobs:
             }
 
             const tddApplicability = getSection("TDD Applicability");
-            const tddRequired = /- \\[x\\] TDD required for this change/i.test(tddApplicability);
-            const tddNotApplicable = /- \\[x\\] TDD not applicable/i.test(tddApplicability);
+            const tddRequired = /- \[x\] TDD required for this change/i.test(tddApplicability);
+            const tddNotApplicable = /- \[x\] TDD not applicable/i.test(tddApplicability);
 
             if ((tddRequired ? 1 : 0) + (tddNotApplicable ? 1 : 0) !== 1) {
               errors.push("Exactly one TDD applicability option must be checked.");
             }
 
             const tddEvidence = getSection("TDD Evidence");
-            const redCommandMatch = tddEvidence.match(/RED command:\\s*`([^`]+)`/i);
-            const redResultMatch = tddEvidence.match(/RED result:\\s*(.+)/i);
-            const greenCommandMatch = tddEvidence.match(/GREEN command\\(s\\):\\s*`([^`]+)`/i);
-            const notApplicableReasonMatch = tddEvidence.match(/Reason not applicable:\\s*(.+)/i);
+            const redCommandMatch = tddEvidence.match(/RED command:\s*`([^`]+)`/i);
+            const redResultMatch = tddEvidence.match(/RED result:\s*(.+)/i);
+            const greenCommandMatch = tddEvidence.match(/GREEN command\(s\):\s*`([^`]+)`/i);
+            const notApplicableReasonMatch = tddEvidence.match(/Reason not applicable:\s*(.+)/i);
 
-            const invalidValues = /^(?:n\\/a|none|tbd|same as above|placeholder)$/i;
+            const invalidValues = /^(?:n\/a|none|tbd|same as above|placeholder)$/i;
 
             if (tddRequired) {
               if (!redCommandMatch || invalidValues.test(redCommandMatch[1].trim())) {

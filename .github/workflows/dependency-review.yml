@@ -4,6 +4,12 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - backend/pom.xml
+      - frontend/package.json
+      - package.json
+      - pnpm-lock.yaml
+      - pnpm-workspace.yaml
 
 permissions:
   contents: read
