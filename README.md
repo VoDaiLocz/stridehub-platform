@@ -100,6 +100,7 @@ This repository contains both:
 - [Execution Checklist and Progress Tracker](./PROGRESS.md)
 - [GitHub Engineering Workflow](./docs/github-engineering-workflow.md)
 - [TDD Engineering Workflow](./docs/tdd-engineering-workflow.md)
+- [Vercel and Render CI/CD Runbook](./docs/vercel-render-cicd.md)
 - [Backend Workspace Guide](./backend/README.md)
 - [Frontend Workspace Guide](./frontend/README.md)
 

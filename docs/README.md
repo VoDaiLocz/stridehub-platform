@@ -17,6 +17,7 @@ StrideHub is a production-style `multi-vendor footwear marketplace` delivered as
 - [TDD Engineering Workflow](./tdd-engineering-workflow.md)
 - [Test Strategy](./test-strategy.md)
 - [Release Checklist](./release-checklist.md)
+- [Vercel and Render CI/CD Runbook](./vercel-render-cicd.md)
 - [Baseline Consistency Audit](./audits/2026-04-02-baseline-consistency-audit.md)
 - [Runbook Index](./runbooks/README.md)
 - [ADR Index](./adr/README.md)
@@ -57,6 +58,7 @@ This repository currently combines two documentation modes:
 - PR template and dependency review workflow
 - pull-request governance workflow with TDD evidence checks
 - dedicated release workflow for packaging and GitHub Release publication
+- Vercel preview and Vercel/Render production deployment workflows
 
 ### Target-State Planning
 
