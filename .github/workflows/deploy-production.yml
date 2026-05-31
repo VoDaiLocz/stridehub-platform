@@ -85,21 +85,90 @@ jobs:
       - name: Build frontend
         run: pnpm --dir frontend build
 
-  deploy-production:
-    name: Deploy Production
+  deploy-backend:
+    name: Deploy Backend (Optional)
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs:
       - backend-quality
+    outputs:
+      status: ${{ steps.backend-result.outputs.status || steps.backend-config.outputs.status }}
+    env:
+      BACKEND_HEALTH_URL: ${{ secrets.BACKEND_HEALTH_URL }}
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+      RENDER_STABILIZATION_SECONDS: ${{ vars.RENDER_STABILIZATION_SECONDS || '90' }}
+
+    steps:
+      - name: Determine Render deployment configuration
+        id: backend-config
+        run: |
+          if [[ -n "${RENDER_DEPLOY_HOOK_URL}" && -n "${BACKEND_HEALTH_URL}" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+            echo "status=configured" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "configured=false" >> "$GITHUB_OUTPUT"
+          echo "status=skipped" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Backend Deployment"
+            echo
+            echo "Render backend deployment skipped because backend deploy secrets are not configured."
+            echo "Required secrets: \`RENDER_DEPLOY_HOOK_URL\`, \`BACKEND_HEALTH_URL\`."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Trigger Render backend deploy
+        if: steps.backend-config.outputs.configured == 'true'
+        run: |
+          curl --fail --show-error --silent --request POST "${RENDER_DEPLOY_HOOK_URL}" >/dev/null
+          echo "Render backend deployment triggered."
+
+      - name: Wait before backend health polling
+        if: steps.backend-config.outputs.configured == 'true'
+        run: sleep "${RENDER_STABILIZATION_SECONDS}"
+
+      - name: Verify backend health
+        if: steps.backend-config.outputs.configured == 'true'
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --show-error --silent --location "${BACKEND_HEALTH_URL}" >/tmp/backend-health.json; then
+              echo "Backend health check passed on attempt ${attempt}."
+              cat /tmp/backend-health.json
+              exit 0
+            fi
+
+            echo "Backend health check attempt ${attempt} failed; retrying in 10 seconds."
+            sleep 10
+          done
+
+          echo "::error::Backend health check did not pass before timeout."
+          exit 1
+
+      - name: Record backend deployment result
+        id: backend-result
+        if: steps.backend-config.outputs.configured == 'true'
+        run: |
+          echo "status=deployed" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Backend Deployment"
+            echo
+            echo "- Status: deployed"
+            echo "- Source: ${GITHUB_SHA}"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy-production:
+    name: Deploy Vercel Production
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs:
       - frontend-quality
+      - deploy-backend
     environment:
       name: production
       url: ${{ steps.vercel-deploy.outputs.url }}
     env:
-      BACKEND_HEALTH_URL: ${{ secrets.BACKEND_HEALTH_URL }}
+      BACKEND_DEPLOY_STATUS: ${{ needs.deploy-backend.outputs.status }}
       FRONTEND_PRODUCTION_URL: ${{ secrets.FRONTEND_PRODUCTION_URL }}
-      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
-      RENDER_STABILIZATION_SECONDS: ${{ vars.RENDER_STABILIZATION_SECONDS || '90' }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -118,37 +187,11 @@ jobs:
           corepack enable
           corepack prepare pnpm@10.28.2 --activate
 
-      - name: Validate deployment secrets
+      - name: Validate Vercel deployment secrets
         run: |
-          test -n "${RENDER_DEPLOY_HOOK_URL}" || (echo "::error::Missing RENDER_DEPLOY_HOOK_URL secret." && exit 1)
-          test -n "${BACKEND_HEALTH_URL}" || (echo "::error::Missing BACKEND_HEALTH_URL secret." && exit 1)
           test -n "${VERCEL_TOKEN}" || (echo "::error::Missing VERCEL_TOKEN secret." && exit 1)
           test -n "${VERCEL_ORG_ID}" || (echo "::error::Missing VERCEL_ORG_ID secret." && exit 1)
           test -n "${VERCEL_PROJECT_ID}" || (echo "::error::Missing VERCEL_PROJECT_ID secret." && exit 1)
-
-      - name: Trigger Render backend deploy
-        run: |
-          curl --fail --show-error --silent --request POST "${RENDER_DEPLOY_HOOK_URL}" >/dev/null
-          echo "Render backend deployment triggered."
-
-      - name: Wait before backend health polling
-        run: sleep "${RENDER_STABILIZATION_SECONDS}"
-
-      - name: Verify backend health
-        run: |
-          for attempt in $(seq 1 30); do
-            if curl --fail --show-error --silent --location "${BACKEND_HEALTH_URL}" >/tmp/backend-health.json; then
-              echo "Backend health check passed on attempt ${attempt}."
-              cat /tmp/backend-health.json
-              exit 0
-            fi
-
-            echo "Backend health check attempt ${attempt} failed; retrying in 10 seconds."
-            sleep 10
-          done
-
-          echo "::error::Backend health check did not pass before timeout."
-          exit 1
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -174,7 +217,7 @@ jobs:
           {
             echo "### Production Deployment"
             echo
-            echo "- Backend health URL: ${BACKEND_HEALTH_URL}"
+            echo "- Backend deploy: ${BACKEND_DEPLOY_STATUS}"
             echo "- Frontend URL: ${frontend_url}"
             echo "- Source: ${GITHUB_SHA}"
           } >> "$GITHUB_STEP_SUMMARY"
