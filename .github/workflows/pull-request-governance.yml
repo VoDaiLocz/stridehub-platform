@@ -102,7 +102,7 @@ jobs:
             const greenCommandMatch = tddEvidence.match(/GREEN command\\(s\\):\\s*`([^`]+)`/i);
             const notApplicableReasonMatch = tddEvidence.match(/Reason not applicable:\\s*(.+)/i);
 
-            const invalidValues = /^(?:n\\/a|none|tbd|same as above|placeholder)$/i;
+            const invalidValues = /^(?:n\/a|none|tbd|same as above|placeholder)$/i;
 
             if (tddRequired) {
               if (!redCommandMatch || invalidValues.test(redCommandMatch[1].trim())) {
