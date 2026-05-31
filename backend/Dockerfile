@@ -13,7 +13,9 @@ WORKDIR /app
 
 RUN addgroup --system stridehub && adduser --system --ingroup stridehub stridehub
 COPY --from=build /workspace/target/*.jar /app/stridehub.jar
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
 USER stridehub
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/stridehub.jar"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]

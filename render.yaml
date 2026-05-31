@@ -11,21 +11,29 @@ services:
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
-      - key: STRIDEHUB_DB_URL
-        sync: false
+      - key: STRIDEHUB_DATABASE_URL
+        fromDatabase:
+          name: stridehub-postgres
+          property: connectionString
       - key: STRIDEHUB_DB_USERNAME
-        sync: false
+        fromDatabase:
+          name: stridehub-postgres
+          property: user
       - key: STRIDEHUB_DB_PASSWORD
-        sync: false
+        fromDatabase:
+          name: stridehub-postgres
+          property: password
       - key: STRIDEHUB_JWT_SECRET
-        sync: false
+        generateValue: true
       - key: STRIDEHUB_WEB_ALLOWED_ORIGINS
-        sync: false
+        value: https://stridehub-platform.vercel.app
       - key: STRIDEHUB_PAYMENT_WEBHOOK_SECRET
-        sync: false
-      - key: STRIDEHUB_REDIS_HOST
-        sync: false
-      - key: STRIDEHUB_REDIS_PORT
-        sync: false
+        generateValue: true
       - key: STRIDEHUB_REDIS_HEALTH_ENABLED
         value: "false"
+
+databases:
+  - name: stridehub-postgres
+    databaseName: stridehub
+    user: stridehub
+    plan: free
